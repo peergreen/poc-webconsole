@@ -1,15 +1,22 @@
 package com.peergreen.webconsole.core.vaadin7;
 
+import com.peergreen.webconsole.core.api.IVaadinUI;
+import com.peergreen.webconsole.core.api.IViewContribution;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
+import com.vaadin.navigator.Navigator;
+import com.vaadin.navigator.ViewChangeListener;
+import com.vaadin.server.Page;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.DragAndDropWrapper;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
@@ -21,7 +28,12 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,7 +45,8 @@ import java.util.Locale;
 
 @Theme("dashboard")
 @Title("Peergreen Administration Console")
-public class MainUI extends UI {
+//@Push
+public class MainUI extends UI implements IVaadinUI {
 
     CssLayout root = new CssLayout();
 
@@ -46,6 +59,21 @@ public class MainUI extends UI {
     private static final long serialVersionUID = -7333618595654346783L;
 
     private HelpManager helpManager;
+
+    private Navigator nav;
+
+    private HashMap<String, List<IViewContribution>> scopes = new HashMap<>();
+
+    private HashMap<String, AbstractScopeView> scopesViews = new HashMap<>();
+
+    private HashMap<String, Button> viewNameToMenuButton = new HashMap<>();
+
+    private List<IViewContribution> views;
+
+    public MainUI(List<IViewContribution> views) {
+        this.views = views;
+    }
+
 
     @Override
     protected void init(final VaadinRequest request) {
@@ -67,15 +95,15 @@ public class MainUI extends UI {
 
     }
 
-    private void buildLoginView(boolean exit) {
+    private void buildLoginView(final boolean exit) {
         if (exit) {
             root.removeAllComponents();
         }
         helpManager.closeAll();
         HelpOverlay w = helpManager
                 .addOverlay(
-                        "Welcome to Peergreen Administration Console",
                         "",
+                        "Welcome to Peergreen Administration Console",
                         "login");
         w.center();
         addWindow(w);
@@ -173,6 +201,9 @@ public class MainUI extends UI {
 
     private void buildMainView() {
 
+        computeScopes();
+        buildRoutes();
+
         helpManager.closeAll();
         removeStyleName("login");
         root.removeComponent(loginLayout);
@@ -192,11 +223,6 @@ public class MainUI extends UI {
                         addComponent(new CssLayout() {
                             {
                                 addStyleName("branding");
-                                Image peergreenLogo = new Image(
-                                        null,
-                                        new ThemeResource("img/peergreen-logo-small-white.png"));
-                                peergreenLogo.setWidth("34px");
-                                addComponent(peergreenLogo);
                                 Label logo = new Label(
                                         "<span>Administration</span> Console",
                                         ContentMode.HTML);
@@ -257,6 +283,7 @@ public class MainUI extends UI {
                         });
                     }
                 });
+
                 // Content
                 addComponent(content);
                 content.setSizeFull();
@@ -268,8 +295,108 @@ public class MainUI extends UI {
 
         menu.removeAllComponents();
 
+        for(final Map.Entry<String, List<IViewContribution>> scope : scopes.entrySet()) {
+            Button b = new NativeButton(scope.getKey().substring(0, 1).toUpperCase()
+                                        + scope.getKey().substring(1).replace('-', ' '));
+            b.addStyleName("icon-dashboard");
+
+            b.addClickListener(new Button.ClickListener() {
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    clearMenuSelection();
+                    event.getButton().addStyleName("selected");
+                    if (!nav.getState().equals("/" + scope.getKey()))
+                        nav.navigateTo("/" + scope.getKey());
+                }
+            });
+
+            menu.addComponent(b);
+
+            viewNameToMenuButton.put("/" + scope.getKey(), b);
+        }
+
         menu.addStyleName("menu");
         menu.setHeight("100%");
 
+        String f = Page.getCurrent().getUriFragment();
+        if (f != null && f.startsWith("!")) {
+            f = f.substring(1);
+        }
+        if (f == null || f.equals("") || f.equals("/")) {
+            nav.navigateTo("/index");
+            //menu.getComponent(0).addStyleName("selected");
+        } else {
+            nav.navigateTo(f);
+            viewNameToMenuButton.get(f).addStyleName("selected");
+        }
+
+        nav.addViewChangeListener(new ViewChangeListener() {
+
+            @Override
+            public boolean beforeViewChange(ViewChangeEvent event) {
+                helpManager.closeAll();
+                return true;
+            }
+
+            @Override
+            public void afterViewChange(ViewChangeEvent event) {
+            }
+        });
+    }
+
+    private void clearMenuSelection() {
+        for (Iterator<Component> it = menu.getComponentIterator(); it.hasNext();) {
+            Component next = it.next();
+            if (next instanceof NativeButton) {
+                next.removeStyleName("selected");
+            } else if (next instanceof DragAndDropWrapper) {
+                // Wow, this is ugly (even uglier than the rest of the code)
+                ((DragAndDropWrapper) next).iterator().next()
+                        .removeStyleName("selected");
+            }
+        }
+    }
+
+    private void computeScopes() {
+        scopes.clear();
+        // Compute scopes
+        for(IViewContribution view : views) {
+            String scope = view.getScope();
+            List<IViewContribution> list;
+            if (scopes.get(scope) == null) {
+                list = new ArrayList();
+                list.add(view);
+                scopes.put(scope, list);
+            } else {
+                list = scopes.get(scope);
+                if (!list.contains(view)) {
+                    list.add(view);
+                }
+            }
+        }
+    }
+
+    private void buildRoutes() {
+        // Build routes
+        nav = new Navigator(this, content);
+        nav.addView("/index", DefaultView.class);
+        for (Map.Entry<String, List<IViewContribution>> scope : scopes.entrySet()) {
+            nav.removeView("/" + scope.getKey());
+            AbstractScopeView scopeView = new AbstractScopeView(scope.getValue(), helpManager, this);
+            nav.addView("/" + scope.getKey(), scopeView);
+            scopesViews.put(scope.getKey(), scopeView);
+        }
+    }
+
+    @Override
+    public void addView(IViewContribution view) {
+        views.add(view);
+        scopesViews.get(view.getScope()).addView(view);
+    }
+
+    @Override
+    public void removeView(IViewContribution view) {
+        views.remove(view);
+        scopesViews.get(view.getScope()).removeView(view);
     }
 }

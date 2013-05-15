@@ -13,7 +13,9 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <vaadin.version>7.0.5</vaadin.version>
+    <vaadin.version>7.1.0.beta1</vaadin.version>
+    <vaadin.icepush.version>0.5.5</vaadin.icepush.version>
+    <icepush.version>3.3.0</icepush.version>
   </properties>
 
   <dependencies>
@@ -34,6 +36,12 @@
       <artifactId>vaadin-themes</artifactId>
       <version>${vaadin.version}</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-client</artifactId>
+      <scope>provided</scope>
+      <version>${vaadin.version}</version>
     </dependency>
     <dependency>
       <groupId>com.vaadin</groupId>
@@ -90,6 +98,12 @@
       <version>4.0.0</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-push</artifactId>
+      <version>${vaadin.version}</version>
+    </dependency>
+
   </dependencies>
 
 </project>

@@ -4,7 +4,9 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Window;
 
-public class HelpOverlay extends Window {
+import java.io.Serializable;
+
+public class HelpOverlay extends Window implements Serializable {
 
     public HelpOverlay() {
         setContent(new CssLayout());

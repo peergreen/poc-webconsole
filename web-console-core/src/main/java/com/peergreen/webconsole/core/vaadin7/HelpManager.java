@@ -15,10 +15,11 @@ import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HelpManager {
+public class HelpManager implements Serializable {
 
     private UI ui;
     private List<HelpOverlay> overlays = new ArrayList<HelpOverlay>();

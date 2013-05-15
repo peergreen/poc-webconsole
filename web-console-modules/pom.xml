@@ -11,6 +11,10 @@
 
   <artifactId>web-console-modules</artifactId>
   <name>Peergreen Web Console :: Modules</name>
+  <modules>
+    <module>bundles-view</module>
+    <module>module1</module>
+  </modules>
   <packaging>pom</packaging>
 
 </project>
