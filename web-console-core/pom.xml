@@ -31,7 +31,8 @@
       <artifactId>vaadin-theme-compiler</artifactId>
       <version>${vaadin.version}</version>
       <scope>provided</scope>
-    </dependency> <dependency>
+    </dependency>
+    <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-themes</artifactId>
       <version>${vaadin.version}</version>
