@@ -40,7 +40,6 @@
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.ipojo.annotations</artifactId>
       <version>1.8.4</version>
-      <type>bundle</type>
       <scope>provided</scope>
     </dependency>
   </dependencies>

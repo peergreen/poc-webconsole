@@ -31,7 +31,8 @@
       <artifactId>vaadin-theme-compiler</artifactId>
       <version>${vaadin.version}</version>
       <scope>provided</scope>
-    </dependency> <dependency>
+    </dependency>
+    <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-themes</artifactId>
       <version>${vaadin.version}</version>
@@ -89,7 +90,6 @@
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.ipojo.annotations</artifactId>
       <version>1.8.4</version>
-      <type>bundle</type>
       <scope>provided</scope>
     </dependency>
     <dependency>

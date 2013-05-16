@@ -1,5 +1,11 @@
 package com.peergreen.webconsole.modules.bundles;
 
+import org.apache.felix.ipojo.annotations.Instantiate;
+import org.apache.felix.ipojo.annotations.Provides;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
+
 import com.peergreen.webconsole.core.api.IViewContribution;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.server.ThemeResource;
@@ -10,10 +16,6 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.NativeButton;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
-import org.apache.felix.ipojo.annotations.Instantiate;
-import org.apache.felix.ipojo.annotations.Provides;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleException;
 
 /**
  * Created with IntelliJ IDEA.
@@ -27,7 +29,12 @@ import org.osgi.framework.BundleException;
 @Instantiate
 public class BundlesModule implements IViewContribution {
 
+    private final BundleContext bundleContext;
     private Table table;
+
+    public BundlesModule(final BundleContext bundleContext) {
+        this.bundleContext = bundleContext;
+    }
 
     @Override
     public Component getView() {
@@ -36,8 +43,9 @@ public class BundlesModule implements IViewContribution {
         verticalLayout.setSpacing(true);
 
         table = new Table();
-        table.addContainerProperty("Bundle Symbolic Name", String.class,
-                new ThemeResource("icons/bundle.png"));
+        table.addContainerProperty("Bundle Symbolic Name",
+                                   String.class,
+                                   new ThemeResource("icons/bundle.png"));
         table.addContainerProperty("Version", String.class, null);
         table.addContainerProperty("State", String.class, null);
         table.addContainerProperty("Active", CheckBox.class, null);
@@ -67,7 +75,7 @@ public class BundlesModule implements IViewContribution {
     }
 
     private void refreshTable() {
-        Bundle[] bundles = Activator.getBundles();
+        Bundle[] bundles = bundleContext.getBundles();
         table.removeAllItems();
 
         int i = 1;
@@ -81,7 +89,8 @@ public class BundlesModule implements IViewContribution {
 
                 @Override
                 public void valueChange(
-                        com.vaadin.data.Property.ValueChangeEvent event) {
+                        com.vaadin.data.Property.ValueChangeEvent event)
+                {
                     if (selectedBundle.getState() == Bundle.ACTIVE) {
                         try {
                             selectedBundle.stop();
@@ -100,8 +109,13 @@ public class BundlesModule implements IViewContribution {
                 }
             });
             table.addItem(
-                    new Object[] { bundle.getSymbolicName(), bundle.getVersion().toString(),
-                            getStateString(bundle), checkBox }, i++);
+                    new Object[] {
+                            bundle.getSymbolicName(),
+                            bundle.getVersion().toString(),
+                            getStateString(bundle),
+                            checkBox
+                    },
+                    i++);
         }
         table.sort();
     }
@@ -128,7 +142,7 @@ public class BundlesModule implements IViewContribution {
 
     @Override
     public String getName() {
-        return "Bundles viewer";
+        return "Bundles";
     }
 
 }
