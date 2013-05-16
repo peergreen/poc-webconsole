@@ -28,6 +28,7 @@ import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import org.w3c.dom.html.HTMLObjectElement;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,6 +36,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * Created with IntelliJ IDEA.
@@ -338,7 +340,7 @@ public class MainUI extends UI implements IVaadinUI {
             f = f.substring(1);
         }
         if (f == null || f.equals("") || f.equals("/")) {
-            nav.navigateTo("/index");
+            nav.navigateTo(HOME_PAGE);
             //menu.getComponent(0).addStyleName("selected");
         } else {
             nav.navigateTo(f);
@@ -382,6 +384,7 @@ public class MainUI extends UI implements IVaadinUI {
                 list = new ArrayList();
                 list.add(view);
                 scopes.put(scope, list);
+                badges.put(scope, 0);
             } else {
                 list = scopes.get(scope);
                 if (!list.contains(view)) {
@@ -394,7 +397,7 @@ public class MainUI extends UI implements IVaadinUI {
     private void buildRoutes() {
         // Build routes
         nav = new Navigator(this, content);
-        nav.addView("/index", DefaultView.class);
+        nav.addView(HOME_PAGE, new DefaultView(rssService));
         for (Map.Entry<String, List<IViewContribution>> scope : scopes.entrySet()) {
             addScopeView(scope.getKey(), scope.getValue());
         }
@@ -409,6 +412,12 @@ public class MainUI extends UI implements IVaadinUI {
 
         scopes.get(view.getScope()).add(view);
         scopesViews.get(view.getScope()).addView(view);
+
+        // Update badge notification
+        Integer nbBadges = badges.get(view.getScope());
+        badges.remove(view.getScope());
+        badges.put(view.getScope(), nbBadges + 1);
+        updateScopeBadge(view.getScope());
     }
 
     @Override
@@ -416,6 +425,9 @@ public class MainUI extends UI implements IVaadinUI {
         views.remove(view);
         scopesViews.get(view.getScope()).removeView(view);
         scopes.get(view.getScope()).remove(view);
+        Integer nbBadges = badges.get(view.getScope());
+        badges.put(view.getScope(), ((nbBadges == 0) ? 0 : nbBadges - 1));
+        updateScopeBadge(view.getScope());
 
         if (scopes.get(view.getScope()).isEmpty()) {
             removeScope(view.getScope());
@@ -433,12 +445,14 @@ public class MainUI extends UI implements IVaadinUI {
 
     private void addScope(String scopeName, List<IViewContribution> modules) {
         scopes.put(scopeName, modules);
+        badges.put(scopeName, 0);
         addScopeView(scopeName);
-        addScopeButtonInMenu(scopeName, modules);
+        addScopeButtonInMenu(scopeName);
     }
 
     private void removeScope(String scopeName) {
         scopes.remove(scopeName);
+        badges.remove(scopeName);
         removeScopeView(scopeName);
         removeScopeButtonInMenu(scopeName);
     }
@@ -458,15 +472,18 @@ public class MainUI extends UI implements IVaadinUI {
         nav.removeView("/" + scopeName);
     }
 
-    private void addScopeButtonInMenu(final String scopeName, List<IViewContribution> modules) {
-        Button b = new NativeButton(scopeName.substring(0, 1).toUpperCase()
-                + scopeName.substring(1).replace('-', ' '));
-        b.addStyleName("icon-dashboard");
+    private void addScopeButtonInMenu(final String scopeName) {
+        final Button b = new NativeButton(scopeName.toUpperCase());
+
+        String style = buttonStyles.get(new Random().nextInt(buttonStyles.size()));
+        b.addStyleName(style);
 
         b.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 clearMenuSelection();
+                removeScopeBadge(scopeName);
+                badges.put(scopeName, 0);
                 event.getButton().addStyleName("selected");
                 if (!nav.getState().equals("/" + scopeName))
                     nav.navigateTo("/" + scopeName);
@@ -481,6 +498,18 @@ public class MainUI extends UI implements IVaadinUI {
     private void removeScopeButtonInMenu(String scopeName) {
         menu.removeComponent(viewNameToMenuButton.get("/" + scopeName));
         viewNameToMenuButton.remove("/" + scopeName);
+    }
+
+    private void updateScopeBadge(String scopeName) {
+        viewNameToMenuButton.get("/" + scopeName).setHtmlContentAllowed(true);
+        viewNameToMenuButton.get("/" + scopeName).setCaption(scopeName.toUpperCase() +
+                    ((badges.get(scopeName) <= 0)?"":"<span class=\"badge\">" + badges.get(scopeName) +"</span>"));
+    }
+
+    private void removeScopeBadge(String scopeName) {
+        viewNameToMenuButton.get("/" + scopeName).setHtmlContentAllowed(true);
+        viewNameToMenuButton.get("/" + scopeName).setCaption(scopeName.toUpperCase());
+        badges.remove(scopeName);
     }
 
 }
