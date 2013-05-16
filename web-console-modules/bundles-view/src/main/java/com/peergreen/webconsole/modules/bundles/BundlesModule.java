@@ -43,9 +43,7 @@ public class BundlesModule implements IViewContribution {
         verticalLayout.setSpacing(true);
 
         table = new Table();
-        table.addContainerProperty("Bundle Symbolic Name",
-                                   String.class,
-                                   new ThemeResource("icons/bundle.png"));
+        table.addContainerProperty("Bundle Symbolic Name", String.class, null);
         table.addContainerProperty("Version", String.class, null);
         table.addContainerProperty("State", String.class, null);
         table.addContainerProperty("Active", CheckBox.class, null);
