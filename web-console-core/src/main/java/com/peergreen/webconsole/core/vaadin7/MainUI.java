@@ -1,5 +1,6 @@
 package com.peergreen.webconsole.core.vaadin7;
 
+import com.peergreen.newsfeed.RssService;
 import com.peergreen.webconsole.core.api.IVaadinUI;
 import com.peergreen.webconsole.core.api.IViewContribution;
 import com.vaadin.annotations.Theme;

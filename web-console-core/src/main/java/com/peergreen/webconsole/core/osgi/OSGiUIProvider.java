@@ -1,5 +1,6 @@
 package com.peergreen.webconsole.core.osgi;
 
+import com.peergreen.newsfeed.RssService;
 import com.peergreen.webconsole.core.api.IVaadinUI;
 import com.peergreen.webconsole.core.api.IViewContribution;
 import com.peergreen.webconsole.core.vaadin7.MainUI;
@@ -11,6 +12,7 @@ import org.apache.felix.ipojo.annotations.Bind;
 import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Instantiate;
 import org.apache.felix.ipojo.annotations.Provides;
+import org.apache.felix.ipojo.annotations.Requires;
 import org.apache.felix.ipojo.annotations.Unbind;
 
 import java.util.ArrayList;
@@ -27,6 +29,9 @@ public class OSGiUIProvider extends UIProvider {
 
     private List<UI> uis = new ArrayList<>();
 
+    @Requires
+    RssService rssService;
+
     @Override
     public Class<? extends UI> getUIClass(final UIClassSelectionEvent event) {
         return MainUI.class;
@@ -34,7 +39,7 @@ public class OSGiUIProvider extends UIProvider {
 
     @Override
     public UI createInstance(final UICreateEvent e) {
-        UI ui = new MainUI(views);
+        UI ui = new MainUI(views, rssService);
         uis.add(ui);
         return ui;
     }
