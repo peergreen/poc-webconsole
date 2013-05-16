@@ -1,5 +1,7 @@
 package com.peergreen.webconsole.core.api;
 
+import com.peergreen.webconsole.core.vaadin7.HelpManager;
+
 /**
  * Created with IntelliJ IDEA.
  * User: mohammed
@@ -12,4 +14,6 @@ public interface IVaadinUI {
     void addView(IViewContribution view);
 
     void removeView(IViewContribution view);
+
+    HelpManager getHelpManager();
 }

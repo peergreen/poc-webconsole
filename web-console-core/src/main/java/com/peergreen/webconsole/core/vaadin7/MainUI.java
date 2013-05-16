@@ -165,29 +165,30 @@ public class MainUI extends UI implements IVaadinUI {
         signin.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                if (username.getValue() != null
-                        && username.getValue().equals("")
-                        && password.getValue() != null
-                        && password.getValue().equals("")) {
-                    signin.removeShortcutListener(enter);
-                    buildMainView();
-                } else {
-                    if (loginPanel.getComponentCount() > 2) {
-                        // Remove the previous error message
-                        loginPanel.removeComponent(loginPanel.getComponent(2));
-                    }
-                    // Add new error message
-                    Label error = new Label(
-                            "Wrong username or password. <span>Hint: try empty values</span>",
-                            ContentMode.HTML);
-                    error.addStyleName("error");
-                    error.setSizeUndefined();
-                    error.addStyleName("light");
-                    // Add animation
-                    error.addStyleName("v-animate-reveal");
-                    loginPanel.addComponent(error);
-                    username.focus();
-                }
+                buildMainView();
+//                if (username.getValue() != null
+//                        && username.getValue().equals("")
+//                        && password.getValue() != null
+//                        && password.getValue().equals("")) {
+//                    signin.removeShortcutListener(enter);
+//                    buildMainView();
+//                } else {
+//                    if (loginPanel.getComponentCount() > 2) {
+//                        // Remove the previous error message
+//                        loginPanel.removeComponent(loginPanel.getComponent(2));
+//                    }
+//                    // Add new error message
+//                    Label error = new Label(
+//                            "Wrong username or password. <span>Hint: try empty values</span>",
+//                            ContentMode.HTML);
+//                    error.addStyleName("error");
+//                    error.setSizeUndefined();
+//                    error.addStyleName("light");
+//                    // Add animation
+//                    error.addStyleName("v-animate-reveal");
+//                    loginPanel.addComponent(error);
+//                    username.focus();
+//                }
             }
         });
 
@@ -296,23 +297,7 @@ public class MainUI extends UI implements IVaadinUI {
         menu.removeAllComponents();
 
         for(final Map.Entry<String, List<IViewContribution>> scope : scopes.entrySet()) {
-            Button b = new NativeButton(scope.getKey().substring(0, 1).toUpperCase()
-                                        + scope.getKey().substring(1).replace('-', ' '));
-            b.addStyleName("icon-dashboard");
-
-            b.addClickListener(new Button.ClickListener() {
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-                    clearMenuSelection();
-                    event.getButton().addStyleName("selected");
-                    if (!nav.getState().equals("/" + scope.getKey()))
-                        nav.navigateTo("/" + scope.getKey());
-                }
-            });
-
-            menu.addComponent(b);
-
-            viewNameToMenuButton.put("/" + scope.getKey(), b);
+            addScopeButtonInMenu(scope.getKey(), scope.getValue());
         }
 
         menu.addStyleName("menu");
@@ -381,16 +366,18 @@ public class MainUI extends UI implements IVaadinUI {
         nav = new Navigator(this, content);
         nav.addView("/index", DefaultView.class);
         for (Map.Entry<String, List<IViewContribution>> scope : scopes.entrySet()) {
-            nav.removeView("/" + scope.getKey());
-            AbstractScopeView scopeView = new AbstractScopeView(scope.getValue(), helpManager, this);
-            nav.addView("/" + scope.getKey(), scopeView);
-            scopesViews.put(scope.getKey(), scopeView);
+            addScopeView(scope.getKey(), scope.getValue());
         }
     }
 
     @Override
     public void addView(IViewContribution view) {
         views.add(view);
+        if (!scopes.containsKey(view.getScope())) {
+            addScope(view.getScope());
+        }
+
+        scopes.get(view.getScope()).add(view);
         scopesViews.get(view.getScope()).addView(view);
     }
 
@@ -398,5 +385,72 @@ public class MainUI extends UI implements IVaadinUI {
     public void removeView(IViewContribution view) {
         views.remove(view);
         scopesViews.get(view.getScope()).removeView(view);
+        scopes.get(view.getScope()).remove(view);
+
+        if (scopes.get(view.getScope()).isEmpty()) {
+            removeScope(view.getScope());
+        }
     }
+
+    @Override
+    public HelpManager getHelpManager() {
+        return helpManager;
+    }
+
+    private void addScope(String scopeName) {
+        addScope(scopeName, new ArrayList<IViewContribution>());
+    }
+
+    private void addScope(String scopeName, List<IViewContribution> modules) {
+        scopes.put(scopeName, modules);
+        addScopeView(scopeName);
+        addScopeButtonInMenu(scopeName, modules);
+    }
+
+    private void removeScope(String scopeName) {
+        scopes.remove(scopeName);
+        removeScopeView(scopeName);
+        removeScopeButtonInMenu(scopeName);
+    }
+
+    private void addScopeView(String scopeName) {
+        addScopeView(scopeName, new ArrayList<IViewContribution>());
+    }
+
+    private void addScopeView(String scopeName, List<IViewContribution> modules) {
+        scopesViews.put(scopeName, new AbstractScopeView(modules, this));
+        nav.removeView("/" + scopeName);
+        nav.addView("/" + scopeName, scopesViews.get(scopeName));
+    }
+
+    private void removeScopeView(String scopeName) {
+        scopesViews.remove(scopeName);
+        nav.removeView("/" + scopeName);
+    }
+
+    private void addScopeButtonInMenu(final String scopeName, List<IViewContribution> modules) {
+        Button b = new NativeButton(scopeName.substring(0, 1).toUpperCase()
+                + scopeName.substring(1).replace('-', ' '));
+        b.addStyleName("icon-dashboard");
+
+        b.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                clearMenuSelection();
+                event.getButton().addStyleName("selected");
+                if (!nav.getState().equals("/" + scopeName))
+                    nav.navigateTo("/" + scopeName);
+            }
+        });
+
+        menu.addComponent(b);
+
+        viewNameToMenuButton.put("/" + scopeName, b);
+    }
+
+    private void removeScopeButtonInMenu(String scopeName) {
+        menu.removeComponent(viewNameToMenuButton.get("/" + scopeName));
+        viewNameToMenuButton.remove("/" + scopeName);
+    }
+
 }

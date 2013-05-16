@@ -3,13 +3,13 @@ package com.peergreen.webconsole.core.vaadin7;
 import com.peergreen.webconsole.core.api.IViewContribution;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.NativeButton;
 import com.vaadin.ui.TabSheet;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -33,30 +33,7 @@ public class AbstractScopeView extends CssLayout implements View {
      */
     private HashMap<IViewContribution, Component> components;
 
-    public AbstractScopeView(List<IViewContribution> modules, final HelpManager helpManager, final MainUI mainUi) {
-
-        Button addTab = new NativeButton("Add tab");
-        addTab.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                CssLayout object = new CssLayout();
-                Label label = new Label("This is an added tab");
-                object.addComponent(label);
-                object.setCaption("Tab");
-
-                tabs.addComponent(object);
-                tabs.getTab(object).setClosable(true);
-            }
-        });
-        addComponent(addTab);
-
-        Button refresh = new NativeButton("Refresh");
-        refresh.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-
-            }
-        });
+    public AbstractScopeView(List<IViewContribution> modules, final MainUI mainUi) {
 
         setSizeFull();
         tabs = new TabSheet();
@@ -77,7 +54,7 @@ public class AbstractScopeView extends CssLayout implements View {
         tabs.setCloseHandler(new TabSheet.CloseHandler() {
             @Override
             public void onTabClose(TabSheet tabsheet, Component tabContent) {
-                HelpOverlay w = helpManager.addOverlay("Attention",
+                HelpOverlay w = mainUi.getHelpManager().addOverlay("Attention",
                         "You have closed " + tabsheet.getTab(tabContent).getCaption() + " module",
                         "login");
                 w.center();
