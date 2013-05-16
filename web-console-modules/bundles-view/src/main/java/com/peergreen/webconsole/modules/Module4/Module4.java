@@ -1,4 +1,4 @@
-package com.peergreen.webconsole.modules.module2;
+package com.peergreen.webconsole.modules.Module4;
 
 import com.peergreen.webconsole.core.api.IViewContribution;
 import com.vaadin.ui.CssLayout;
@@ -16,7 +16,7 @@ import org.apache.felix.ipojo.annotations.Provides;
 @org.apache.felix.ipojo.annotations.Component
 @Provides
 @Instantiate
-public class Module2 implements IViewContribution {
+public class Module4 implements IViewContribution {
     @Override
     public com.vaadin.ui.Component getView() {
         CssLayout component = new CssLayout();
@@ -30,11 +30,11 @@ public class Module2 implements IViewContribution {
 
     @Override
     public String getScope() {
-        return "security";
+        return "Shell";
     }
 
     @Override
     public String getName() {
-        return "Security Manager";
+        return "Shell Manager";
     }
 }

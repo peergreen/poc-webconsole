@@ -13,7 +13,7 @@
   <name>Peergreen Web Console :: Modules</name>
   <modules>
     <module>bundles-view</module>
-    <module>module1</module>
+    <module>store-manager</module>
   </modules>
   <packaging>pom</packaging>
 

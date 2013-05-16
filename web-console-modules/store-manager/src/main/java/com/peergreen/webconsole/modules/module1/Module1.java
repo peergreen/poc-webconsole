@@ -30,11 +30,11 @@ public class Module1 implements IViewContribution {
 
     @Override
     public String getScope() {
-        return "Module";
+        return "store";
     }
 
     @Override
     public String getName() {
-        return "Module 1";
+        return "Store Manager";
     }
 }
