@@ -14,6 +14,7 @@
   <modules>
     <module>bundles-view</module>
     <module>store-manager</module>
+    <module>bundle-test</module>
   </modules>
   <packaging>pom</packaging>
 
