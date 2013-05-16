@@ -4,40 +4,27 @@ import com.peergreen.newsfeed.FeedMessage;
 import com.peergreen.newsfeed.Rss;
 import com.peergreen.newsfeed.RssService;
 import com.peergreen.newsfeed.RssServiceException;
-import com.vaadin.data.Property;
-import com.vaadin.event.LayoutEvents;
 import com.vaadin.event.ShortcutAction;
-import com.vaadin.event.dd.DragAndDropEvent;
-import com.vaadin.event.dd.DropHandler;
-import com.vaadin.event.dd.acceptcriteria.AcceptAll;
-import com.vaadin.event.dd.acceptcriteria.AcceptCriterion;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
-import com.vaadin.server.ExternalResource;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.DragAndDropWrapper;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.NativeButton;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextArea;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 
 /**
  * Created with IntelliJ IDEA.
@@ -83,22 +70,10 @@ public class DefaultView extends VerticalLayout implements View {
         CssLayout panel = createPanel(notes);
         panel.addStyleName("notes");
         row.addComponent(panel);
-
-        row = new HorizontalLayout();
-        row.setMargin(true);
-        row.setSizeFull();
-        row.setSpacing(true);
-        addComponent(row);
-        setExpandRatio(row, 2);
     }
 
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {
-
-
-//        row.addComponent(createPanel(null));
-
-//        row.addComponent(createPanel(null));
     }
 
     private CssLayout createPanel(Component content) {
@@ -210,5 +185,9 @@ public class DefaultView extends VerticalLayout implements View {
         l.addComponent(footer);
 
         return w;
+    }
+
+    private Component getMemoryInformation() {
+        return null;
     }
 }
