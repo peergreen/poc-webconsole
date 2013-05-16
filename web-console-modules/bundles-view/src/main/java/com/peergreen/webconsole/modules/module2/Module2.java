@@ -1,10 +1,15 @@
 package com.peergreen.webconsole.modules.module2;
 
-import com.peergreen.webconsole.core.api.IViewContribution;
-import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.Label;
+import static java.lang.String.format;
+
 import org.apache.felix.ipojo.annotations.Instantiate;
 import org.apache.felix.ipojo.annotations.Provides;
+import org.osgi.framework.BundleContext;
+
+import com.peergreen.webconsole.core.api.IViewContribution;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.Label;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,12 +22,20 @@ import org.apache.felix.ipojo.annotations.Provides;
 @Provides
 @Instantiate
 public class Module2 implements IViewContribution {
+
+    private final BundleContext bundleContext;
+
+    public Module2(BundleContext bundleContext) {
+        this.bundleContext = bundleContext;
+    }
+
     @Override
-    public com.vaadin.ui.Component getView() {
+    public Component getView() {
         CssLayout component = new CssLayout();
         component.addStyleName("timeline");
 
-        Label header = new Label("This is a view contribution ! ");
+        Label header = new Label(format("This view contribution comes from Bundle %s ! ",
+                                        bundleContext.getBundle().getSymbolicName()));
         header.addStyleName("h1");
         component.addComponent(header);
         return component;
