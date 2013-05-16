@@ -71,10 +71,24 @@ public class MainUI extends UI implements IVaadinUI {
 
     private List<IViewContribution> views;
 
-    public MainUI(List<IViewContribution> views) {
+    private HashMap<String, Integer> badges = new HashMap<>();
+
+    private final static String HOME_PAGE="/home";
+
+    private RssService rssService;
+
+    public MainUI(List<IViewContribution> views, RssService rssService) {
         this.views = views;
+        this.rssService = rssService;
     }
 
+    private List<String> buttonStyles = new ArrayList<String>() {{
+        add("icon-dashboard");
+        add("icon-sales");
+        add("icon-schedule");
+        add("icon-reports");
+        add("icon-transactions");
+    }};
 
     @Override
     protected void init(final VaadinRequest request) {
@@ -296,9 +310,24 @@ public class MainUI extends UI implements IVaadinUI {
         });
 
         menu.removeAllComponents();
+        Button home = new NativeButton();
+
+        home.addStyleName("icon-dashboard");
+
+        home.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                clearMenuSelection();
+                event.getButton().addStyleName("selected");
+                if (!nav.getState().equals(HOME_PAGE))
+                    nav.navigateTo(HOME_PAGE);
+            }
+        });
+        viewNameToMenuButton.put(HOME_PAGE, home);
+        menu.addComponent(home);
 
         for(final Map.Entry<String, List<IViewContribution>> scope : scopes.entrySet()) {
-            addScopeButtonInMenu(scope.getKey(), scope.getValue());
+            addScopeButtonInMenu(scope.getKey());
         }
 
         menu.addStyleName("menu");
