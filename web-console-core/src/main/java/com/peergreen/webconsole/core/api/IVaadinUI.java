@@ -1,7 +1,5 @@
 package com.peergreen.webconsole.core.api;
 
-import com.peergreen.webconsole.core.vaadin7.HelpManager;
-
 /**
  * Created with IntelliJ IDEA.
  * User: mohammed
@@ -9,11 +7,10 @@ import com.peergreen.webconsole.core.vaadin7.HelpManager;
  * Time: 17:03
  * To change this template use File | Settings | File Templates.
  */
-public interface IVaadinUI {
+public interface IVaadinUI extends IUiManager {
 
-    void addView(IViewContribution view);
+    void addScope(IScopeProvider scope);
 
-    void removeView(IViewContribution view);
+    void removeScope(IScopeProvider scope);
 
-    HelpManager getHelpManager();
 }

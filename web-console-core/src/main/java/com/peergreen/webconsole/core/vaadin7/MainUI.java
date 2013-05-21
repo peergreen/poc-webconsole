@@ -1,8 +1,9 @@
 package com.peergreen.webconsole.core.vaadin7;
 
-import com.peergreen.newsfeed.RssService;
+import com.peergreen.webconsole.core.api.IHelpManager;
+import com.peergreen.webconsole.core.api.IScopeProvider;
 import com.peergreen.webconsole.core.api.IVaadinUI;
-import com.peergreen.webconsole.core.api.IViewContribution;
+import com.peergreen.webconsole.core.scopes.ScopeExceptionView;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.event.ShortcutAction;
@@ -28,7 +29,6 @@ import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import org.w3c.dom.html.HTMLObjectElement;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,27 +61,27 @@ public class MainUI extends UI implements IVaadinUI {
 
     private static final long serialVersionUID = -7333618595654346783L;
 
-    private HelpManager helpManager;
+    private IHelpManager helpManager;
 
     private Navigator nav;
 
-    private HashMap<String, List<IViewContribution>> scopes = new HashMap<>();
-
-    private HashMap<String, AbstractScopeView> scopesViews = new HashMap<>();
+    private HashMap<String, IScopeProvider> scopes = new HashMap<>();
 
     private HashMap<String, Button> viewNameToMenuButton = new HashMap<>();
 
-    private List<IViewContribution> views;
+    private String selectedView = "";
 
-    private HashMap<String, Integer> badges = new HashMap<>();
+    private String mainScope = "";
 
-    private final static String HOME_PAGE="/home";
+    private BadRequestView badRequestView;
 
-    private RssService rssService;
-
-    public MainUI(List<IViewContribution> views, RssService rssService) {
-        this.views = views;
-        this.rssService = rssService;
+    public MainUI(List<IScopeProvider> scopes, IHelpManager helpManager, String mainScope) {
+        this.helpManager = helpManager;
+        this.mainScope = mainScope;
+        for (IScopeProvider scope : scopes) {
+            this.scopes.put(scope.getName(), scope);
+        }
+        badRequestView = new BadRequestView();
     }
 
     private List<String> buttonStyles = new ArrayList<String>() {{
@@ -94,8 +94,6 @@ public class MainUI extends UI implements IVaadinUI {
 
     @Override
     protected void init(final VaadinRequest request) {
-
-        helpManager = new HelpManager(this);
 
         setLocale(Locale.US);
 
@@ -219,7 +217,6 @@ public class MainUI extends UI implements IVaadinUI {
 
     private void buildMainView() {
 
-        computeScopes();
         buildRoutes();
 
         helpManager.closeAll();
@@ -312,23 +309,8 @@ public class MainUI extends UI implements IVaadinUI {
         });
 
         menu.removeAllComponents();
-        Button home = new NativeButton();
 
-        home.addStyleName("icon-dashboard");
-
-        home.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                clearMenuSelection();
-                event.getButton().addStyleName("selected");
-                if (!nav.getState().equals(HOME_PAGE))
-                    nav.navigateTo(HOME_PAGE);
-            }
-        });
-        viewNameToMenuButton.put(HOME_PAGE, home);
-        menu.addComponent(home);
-
-        for(final Map.Entry<String, List<IViewContribution>> scope : scopes.entrySet()) {
+        for(final Map.Entry<String, IScopeProvider> scope : scopes.entrySet()) {
             addScopeButtonInMenu(scope.getKey());
         }
 
@@ -340,11 +322,16 @@ public class MainUI extends UI implements IVaadinUI {
             f = f.substring(1);
         }
         if (f == null || f.equals("") || f.equals("/")) {
-            nav.navigateTo(HOME_PAGE);
-            //menu.getComponent(0).addStyleName("selected");
-        } else {
+            nav.navigateTo("/" + mainScope);
+            viewNameToMenuButton.get("/" + mainScope).addStyleName("selected");
+            selectedView = "/" + mainScope;
+        } else if (viewNameToMenuButton.containsKey(f)) {
             nav.navigateTo(f);
             viewNameToMenuButton.get(f).addStyleName("selected");
+            selectedView = f;
+        } else {
+            badRequestView.setBadRequest(f.substring(1));
+            nav.navigateTo("/badrequest");
         }
 
         nav.addViewChangeListener(new ViewChangeListener() {
@@ -374,117 +361,103 @@ public class MainUI extends UI implements IVaadinUI {
         }
     }
 
-    private void computeScopes() {
-        scopes.clear();
-        // Compute scopes
-        for(IViewContribution view : views) {
-            String scope = view.getScope();
-            List<IViewContribution> list;
-            if (scopes.get(scope) == null) {
-                list = new ArrayList();
-                list.add(view);
-                scopes.put(scope, list);
-                badges.put(scope, 0);
-            } else {
-                list = scopes.get(scope);
-                if (!list.contains(view)) {
-                    list.add(view);
-                }
+    private void buildRoutes() {
+        nav = new Navigator(this, content);
+        // Build routes
+        for (Map.Entry<String, IScopeProvider> scope : scopes.entrySet()) {
+            addRouteToNav(scope.getValue());
+        }
+        nav.addView("/badrequest", badRequestView);
+    }
+
+    private void addRouteToNav(IScopeProvider scope) {
+        if (nav != null) {
+            try {
+                nav.removeView("/" + scope.getName());
+                nav.addView("/" + scope.getName(), scope.getView());
+            } catch (Exception e) {
+                nav.addView("/" + scope.getName(), new ScopeExceptionView(e));
             }
         }
     }
 
-    private void buildRoutes() {
-        // Build routes
-        nav = new Navigator(this, content);
-        nav.addView(HOME_PAGE, new DefaultView(rssService));
-        for (Map.Entry<String, List<IViewContribution>> scope : scopes.entrySet()) {
-            addScopeView(scope.getKey(), scope.getValue());
+    private void removeRouteFromNav(IScopeProvider scope) {
+        if (nav != null) {
+            nav.removeView("/" + scope.getName());
         }
     }
 
     @Override
-    public void addView(IViewContribution view) {
-        views.add(view);
-        if (!scopes.containsKey(view.getScope())) {
-            addScope(view.getScope());
-        }
+    public void addScope(IScopeProvider scope) {
+        scopes.put(scope.getName(), scope);
 
-        scopes.get(view.getScope()).add(view);
-        scopesViews.get(view.getScope()).addView(view);
+        addRouteToNav(scope);
 
-        // Update badge notification
-        Integer nbBadges = badges.get(view.getScope());
-        badges.remove(view.getScope());
-        badges.put(view.getScope(), nbBadges + 1);
-        updateScopeBadge(view.getScope());
+        updateScopeMenuButton(scope.getName());
+
+        updateScopeBadge(scope.getName());
     }
 
     @Override
-    public void removeView(IViewContribution view) {
-        views.remove(view);
-        scopesViews.get(view.getScope()).removeView(view);
-        scopes.get(view.getScope()).remove(view);
-        Integer nbBadges = badges.get(view.getScope());
-        badges.put(view.getScope(), ((nbBadges == 0) ? 0 : nbBadges - 1));
-        updateScopeBadge(view.getScope());
+    public void removeScope(IScopeProvider scope) {
+        scopes.remove(scope.getName());
 
-        if (scopes.get(view.getScope()).isEmpty()) {
-            removeScope(view.getScope());
-        }
+        removeRouteFromNav(scope);
+
+        updateScopeMenuButton(scope.getName());
     }
 
     @Override
-    public HelpManager getHelpManager() {
-        return helpManager;
+    public void setMainScope(String scopeName) {
+        mainScope = scopeName;
     }
 
-    private void addScope(String scopeName) {
-        addScope(scopeName, new ArrayList<IViewContribution>());
-    }
+    public void updateScopeMenuButton(String scopeName) {
 
-    private void addScope(String scopeName, List<IViewContribution> modules) {
-        scopes.put(scopeName, modules);
-        badges.put(scopeName, 0);
-        addScopeView(scopeName);
-        addScopeButtonInMenu(scopeName);
-    }
-
-    private void removeScope(String scopeName) {
-        scopes.remove(scopeName);
-        badges.remove(scopeName);
-        removeScopeView(scopeName);
-        removeScopeButtonInMenu(scopeName);
-    }
-
-    private void addScopeView(String scopeName) {
-        addScopeView(scopeName, new ArrayList<IViewContribution>());
-    }
-
-    private void addScopeView(String scopeName, List<IViewContribution> modules) {
-        scopesViews.put(scopeName, new AbstractScopeView(modules, this));
-        nav.removeView("/" + scopeName);
-        nav.addView("/" + scopeName, scopesViews.get(scopeName));
-    }
-
-    private void removeScopeView(String scopeName) {
-        scopesViews.remove(scopeName);
-        nav.removeView("/" + scopeName);
+        if (viewNameToMenuButton.containsKey("/" + scopeName)) {
+            if (!scopes.containsKey(scopeName)) {
+                // this scope was removed, remove its button from menu
+                menu.removeComponent(viewNameToMenuButton.get("/" + scopeName));
+                viewNameToMenuButton.remove("/" + scopeName);
+                return; // exit this method to avoid following tests
+            }
+            if (scopes.get(scopeName).getViewsInScope().isEmpty()) {
+                // this scope is empty, hide it
+                viewNameToMenuButton.get("/" + scopeName).setVisible(false);
+            }
+            if (!viewNameToMenuButton.get("/" + scopeName).isVisible()
+                    && !scopes.get(scopeName).getViewsInScope().isEmpty()) {
+                // a view was added to a hidden scope, show it
+                viewNameToMenuButton.get("/" + scopeName).setVisible(true);
+            }
+        } else {
+            // new scope
+            addScopeButtonInMenu(scopeName);
+        }
     }
 
     private void addScopeButtonInMenu(final String scopeName) {
+        if (!scopes.containsKey(scopeName)) {
+            return;
+        }
+
         final Button b = new NativeButton(scopeName.toUpperCase());
 
-        String style = buttonStyles.get(new Random().nextInt(buttonStyles.size()));
-        b.addStyleName(style);
+        if (mainScope.equals(scopeName)) {
+            b.addStyleName("icon-dashboard");
+        } else {
+            String style = buttonStyles.get(new Random().nextInt(buttonStyles.size()));
+            b.addStyleName(style);
+        }
 
         b.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 clearMenuSelection();
                 removeScopeBadge(scopeName);
-                badges.put(scopeName, 0);
+                scopes.get(scopeName).setBadge(0);
                 event.getButton().addStyleName("selected");
+                selectedView = "/" + scopeName;
                 if (!nav.getState().equals("/" + scopeName))
                     nav.navigateTo("/" + scopeName);
             }
@@ -492,24 +465,29 @@ public class MainUI extends UI implements IVaadinUI {
 
         menu.addComponent(b);
 
+        if (!mainScope.equals(scopeName) && scopes.get(scopeName).getViewsInScope().isEmpty()) {
+            b.setVisible(false);
+        }
+
         viewNameToMenuButton.put("/" + scopeName, b);
     }
 
-    private void removeScopeButtonInMenu(String scopeName) {
-        menu.removeComponent(viewNameToMenuButton.get("/" + scopeName));
-        viewNameToMenuButton.remove("/" + scopeName);
-    }
+    public void updateScopeBadge(String scopeName) {
+        if (!viewNameToMenuButton.containsKey("/" + scopeName)) {
+            return;
+        }
 
-    private void updateScopeBadge(String scopeName) {
-        viewNameToMenuButton.get("/" + scopeName).setHtmlContentAllowed(true);
-        viewNameToMenuButton.get("/" + scopeName).setCaption(scopeName.toUpperCase() +
-                    ((badges.get(scopeName) <= 0)?"":"<span class=\"badge\">" + badges.get(scopeName) +"</span>"));
+        if (!selectedView.equals("/" + scopeName)) {
+            viewNameToMenuButton.get("/" + scopeName).setHtmlContentAllowed(true);
+            viewNameToMenuButton.get("/" + scopeName).setCaption(scopeName.toUpperCase() +
+                                ((scopes.get(scopeName).getBadge() <= 0)?"":"<span class=\"badge\">" +
+                                scopes.get(scopeName).getBadge() +"</span>"));
+        }
     }
 
     private void removeScopeBadge(String scopeName) {
         viewNameToMenuButton.get("/" + scopeName).setHtmlContentAllowed(true);
         viewNameToMenuButton.get("/" + scopeName).setCaption(scopeName.toUpperCase());
-        badges.remove(scopeName);
     }
 
 }

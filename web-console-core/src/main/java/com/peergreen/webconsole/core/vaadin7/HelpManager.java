@@ -10,23 +10,24 @@
 
 package com.peergreen.webconsole.core.vaadin7;
 
+import com.peergreen.webconsole.core.api.IHelpManager;
 import com.vaadin.navigator.View;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.UI;
+import org.apache.felix.ipojo.annotations.Component;
+import org.apache.felix.ipojo.annotations.Instantiate;
+import org.apache.felix.ipojo.annotations.Provides;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HelpManager implements Serializable {
+@Component
+@Provides
+@Instantiate
+public class HelpManager implements IHelpManager {
 
-    private UI ui;
     private List<HelpOverlay> overlays = new ArrayList<HelpOverlay>();
 
-    public HelpManager(UI ui) {
-        this.ui = ui;
-    }
 
     public void closeAll() {
         for (HelpOverlay overlay : overlays) {
@@ -42,7 +43,7 @@ public class HelpManager implements Serializable {
 
     }
 
-    protected HelpOverlay addOverlay(String caption, String text, String style) {
+    public HelpOverlay addOverlay(String caption, String text, String style) {
         HelpOverlay o = new HelpOverlay();
         o.setCaption(caption);
         o.addComponent(new Label(text, ContentMode.HTML));
