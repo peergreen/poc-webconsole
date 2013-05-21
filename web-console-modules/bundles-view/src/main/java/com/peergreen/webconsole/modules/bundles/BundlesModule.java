@@ -8,7 +8,6 @@ import org.osgi.framework.BundleException;
 
 import com.peergreen.webconsole.core.api.IViewContribution;
 import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
