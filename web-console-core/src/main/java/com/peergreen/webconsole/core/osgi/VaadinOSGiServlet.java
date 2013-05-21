@@ -33,14 +33,12 @@ public class VaadinOSGiServlet extends VaadinServlet {
     @Validate
     public void start() throws ServletException, NamespaceException {
         httpService.registerServlet(ALIAS, this, null, null);
-        httpService.registerServlet(ALIAS + "/*", this, null, null);
         httpService.registerResources(RESOURCE_BASE, RESOURCE_BASE, null);
     }
 
     @Invalidate
     public void stop() {
         httpService.unregister(ALIAS);
-        httpService.unregister(ALIAS + "/*");
         httpService.unregister(RESOURCE_BASE);
     }
 
@@ -55,7 +53,6 @@ public class VaadinOSGiServlet extends VaadinServlet {
             @Override
             public void sessionInit(SessionInitEvent e) throws ServiceException {
                 e.getSession().addUIProvider(provider);
-                //service.removeSessionInitListener(this);
             }
          });
 
