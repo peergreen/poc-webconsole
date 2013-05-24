@@ -16,10 +16,11 @@
   <modules>
     <module>web-console-core</module>
     <module>web-console-modules</module>
+    <module>web-console-pgadmin</module>
   </modules>
 
   <properties>
-    <ipojo.version>1.8.4</ipojo.version>
+    <ipojo.version>1.8.6</ipojo.version>
     <vaadin.version>7.1.0.beta1</vaadin.version>
     <peergreen.newsfeed.version>1.0.1-SNAPSHOT</peergreen.newsfeed.version>
   </properties>
