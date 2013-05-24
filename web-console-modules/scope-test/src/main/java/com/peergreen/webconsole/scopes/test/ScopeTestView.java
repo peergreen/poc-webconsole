@@ -1,9 +1,8 @@
 package com.peergreen.webconsole.scopes.test;
 
-import com.peergreen.webconsole.core.api.IScopeView;
-import com.peergreen.webconsole.core.api.IViewContribution;
-import com.peergreen.webconsole.core.vaadin7.HelpOverlay;
-import com.peergreen.webconsole.core.api.IHelpManager;
+import com.peergreen.webconsole.core.api.IModuleFactory;
+import com.peergreen.webconsole.core.api.INotifierService;
+import com.peergreen.webconsole.core.notifier.NotificationOverlay;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.ui.Component;
@@ -20,7 +19,7 @@ import java.util.List;
  * Time: 15:50
  * To change this template use File | Settings | File Templates.
  */
-public class ScopeTestView extends CssLayout implements View, IScopeView {
+public class ScopeTestView extends CssLayout implements View {
     /*
         List of modules tabs in this scope
      */
@@ -30,9 +29,9 @@ public class ScopeTestView extends CssLayout implements View, IScopeView {
         Map of modules and there views registered in tabs
         Used for identify a tab
      */
-    private HashMap<IViewContribution, Component> components;
+    private HashMap<IModuleFactory, Component> components;
 
-    public ScopeTestView(List<IViewContribution> views, final IHelpManager helpManager) {
+    public ScopeTestView(List<IModuleFactory> views, final INotifierService helpManager) {
 
         setSizeFull();
         tabs = new TabSheet();
@@ -42,7 +41,7 @@ public class ScopeTestView extends CssLayout implements View, IScopeView {
 
         components = new HashMap<>();
 
-        for (IViewContribution module : views) {
+        for (IModuleFactory module : views) {
             Component view = module.getView();
             tabs.addComponent(view);
             tabs.getTab(view).setClosable(true);
@@ -53,7 +52,7 @@ public class ScopeTestView extends CssLayout implements View, IScopeView {
         tabs.setCloseHandler(new TabSheet.CloseHandler() {
             @Override
             public void onTabClose(TabSheet tabsheet, Component tabContent) {
-                HelpOverlay w = helpManager.addOverlay("Attention",
+                NotificationOverlay w = helpManager.addOverlay("Attention",
                         "You have closed " + tabsheet.getTab(tabContent).getCaption() + " module",
                         "login");
                 w.center();
@@ -68,16 +67,16 @@ public class ScopeTestView extends CssLayout implements View, IScopeView {
 
     }
 
-    public void addView(IViewContribution viewContribution) {
-        Component view = viewContribution.getView();
+    public void addModule(IModuleFactory moduleFactory) {
+        Component view = moduleFactory.getView();
         tabs.addComponent(view);
         tabs.getTab(view).setClosable(true);
-        tabs.getTab(view).setCaption(viewContribution.getName());
-        components.put(viewContribution, view);
+        tabs.getTab(view).setCaption(moduleFactory.getName());
+        components.put(moduleFactory, view);
     }
 
-    public void removeView(IViewContribution viewContribution) {
-        tabs.removeComponent(components.get(viewContribution));
-        components.remove(viewContribution);
+    public void removeModule(IModuleFactory moduleFactory) {
+        tabs.removeComponent(components.get(moduleFactory));
+        components.remove(moduleFactory);
     }
 }

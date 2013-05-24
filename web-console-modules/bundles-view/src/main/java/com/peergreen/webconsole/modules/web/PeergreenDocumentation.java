@@ -1,6 +1,6 @@
 package com.peergreen.webconsole.modules.web;
 
-import com.peergreen.webconsole.core.api.IViewContribution;
+import com.peergreen.webconsole.core.api.IModuleFactory;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.Component;
@@ -18,7 +18,7 @@ import org.apache.felix.ipojo.annotations.Provides;
 @org.apache.felix.ipojo.annotations.Component
 @Provides
 @Instantiate
-public class PeergreenDocumentation implements IViewContribution {
+public class PeergreenDocumentation implements IModuleFactory {
     @Override
     public Component getView() {
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -34,6 +34,11 @@ public class PeergreenDocumentation implements IViewContribution {
     @Override
     public String getScope() {
         return "web";
+    }
+
+    @Override
+    public String getConsole() {
+        return "pgadmin";
     }
 
     @Override

@@ -2,11 +2,11 @@ package com.peergreen.webconsole.modules.module2;
 
 import static java.lang.String.format;
 
+import com.peergreen.webconsole.core.api.IModuleFactory;
 import org.apache.felix.ipojo.annotations.Instantiate;
 import org.apache.felix.ipojo.annotations.Provides;
 import org.osgi.framework.BundleContext;
 
-import com.peergreen.webconsole.core.api.IViewContribution;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
@@ -21,7 +21,7 @@ import com.vaadin.ui.Label;
 @org.apache.felix.ipojo.annotations.Component
 @Provides
 @Instantiate
-public class Module2 implements IViewContribution {
+public class Module2 implements IModuleFactory {
 
     private final BundleContext bundleContext;
 
@@ -44,6 +44,11 @@ public class Module2 implements IViewContribution {
     @Override
     public String getScope() {
         return "security";
+    }
+
+    @Override
+    public String getConsole() {
+        return "pgadmin";
     }
 
     @Override

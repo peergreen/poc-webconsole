@@ -1,6 +1,6 @@
 package com.peergreen.webconsole.modules.module3;
 
-import com.peergreen.webconsole.core.api.IViewContribution;
+import com.peergreen.webconsole.core.api.IModuleFactory;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
 import org.apache.felix.ipojo.annotations.Instantiate;
@@ -16,7 +16,7 @@ import org.apache.felix.ipojo.annotations.Provides;
 @org.apache.felix.ipojo.annotations.Component
 @Provides
 @Instantiate
-public class Module3 implements IViewContribution {
+public class Module3 implements IModuleFactory {
     @Override
     public com.vaadin.ui.Component getView() {
         CssLayout component = new CssLayout();
@@ -31,6 +31,11 @@ public class Module3 implements IViewContribution {
     @Override
     public String getScope() {
         return "deployment";
+    }
+
+    @Override
+    public String getConsole() {
+        return "pgadmin";
     }
 
     @Override

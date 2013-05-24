@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.peergreen.webconsole.core.api.IModuleFactory;
 import org.apache.felix.ipojo.annotations.Instantiate;
 import org.apache.felix.ipojo.annotations.Provides;
 import org.osgi.framework.Bundle;
@@ -13,7 +14,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 
-import com.peergreen.webconsole.core.api.IViewContribution;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
@@ -31,7 +31,7 @@ import com.vaadin.ui.VerticalLayout;
 @org.apache.felix.ipojo.annotations.Component
 @Provides
 @Instantiate
-public class ServicesModule implements IViewContribution {
+public class ServicesModule implements IModuleFactory {
 
     private final BundleContext bundleContext;
     private Table table;
@@ -111,6 +111,11 @@ public class ServicesModule implements IViewContribution {
     @Override
     public String getScope() {
         return "osgi";
+    }
+
+    @Override
+    public String getConsole() {
+        return "pgadmin";
     }
 
     @Override

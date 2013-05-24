@@ -1,10 +1,9 @@
 package com.peergreen.webconsole.scopes.test;
 
-import com.peergreen.webconsole.core.api.IScopeProvider;
-import com.peergreen.webconsole.core.api.IViewContribution;
-import com.peergreen.webconsole.core.api.IHelpManager;
-import com.peergreen.webconsole.core.api.IUiManager;
-import com.peergreen.webconsole.core.scopes.AbstractScope;
+import com.peergreen.webconsole.core.api.IModuleFactory;
+import com.peergreen.webconsole.core.api.INotifierService;
+import com.peergreen.webconsole.core.api.IScopeFactory;
+import com.peergreen.webconsole.core.api.IScopeTabsFactory;
 import com.vaadin.navigator.View;
 import org.apache.felix.ipojo.annotations.Bind;
 import org.apache.felix.ipojo.annotations.Component;
@@ -14,9 +13,6 @@ import org.apache.felix.ipojo.annotations.Provides;
 import org.apache.felix.ipojo.annotations.Requires;
 import org.apache.felix.ipojo.annotations.Unbind;
 import org.apache.felix.ipojo.annotations.Validate;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -28,118 +24,27 @@ import java.util.List;
 @Component
 @Instantiate
 @Provides
-public class TestScope extends AbstractScope implements IScopeProvider {
+public class TestScope implements IScopeFactory {
 
-    /**
-     * Scope name
-     */
-    public final static String SCOPE_NAME = "web";
+    final static String SCOPE_NAME = "web";
 
-    /**
-     * Help Manager
-     */
+    final static String STYLE = "icon-sales";
+
     @Requires
-    private IHelpManager helpManager;
+    IScopeTabsFactory scopeTabsFactory;
 
-    /**
-     * UI Manager
-     */
-    @Requires
-    private IUiManager uiManager;
-
-    /**
-     * Get scope name
-     * @return scope name
-     */
     @Override
     public String getName() {
         return SCOPE_NAME;
     }
 
-    /**
-     * Get scope view
-     * @return instance of scope view
-     */
     @Override
     public View getView() {
-        if (firstCall) {
-            firstCall =  false;
-            return view;
-        }
-        View newView = new ScopeTestView(views, helpManager);
-        instancesOfScopeView.add(newView);
-        return newView;
+        return scopeTabsFactory.createInstance(SCOPE_NAME);
     }
 
-    /**
-     * Register a new view in this scope
-     * @param viewContribution
-     */
-    public void addView(IViewContribution viewContribution) {
-        if (view != null) {
-            views.add(viewContribution);
-            badge++;
-            updateInstancesOfScopeView(viewContribution, false);
-            uiManager.updateScopeMenuButton(getName());
-            uiManager.updateScopeBadge(getName());
-        } else {
-            viewsInWaitList.add(viewContribution);
-        }
-    }
-
-    /**
-     * Unregister a view from this scope
-     * @param viewContribution
-     */
-    public void removeView(IViewContribution viewContribution) {
-        if (view != null) {
-            views.remove(viewContribution);
-            badge--;
-            updateInstancesOfScopeView(viewContribution, true);
-            uiManager.updateScopeMenuButton(getName());
-            uiManager.updateScopeBadge(getName());
-        } else {
-            if (viewsInWaitList.contains(viewContribution)) {
-                viewsInWaitList.remove(viewContribution);
-            }
-        }
-    }
-
-    @Bind(aggregate = true, optional = true)
-    public void bindViewContribution(IViewContribution view) {
-        if (SCOPE_NAME.equals(view.getScope())) {
-            try {
-                addView(view);
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Unbind(aggregate = true, optional = true)
-    public void unbindViewContribution(IViewContribution view) {
-        if(SCOPE_NAME.equals(view.getScope())) {
-            removeView(view);
-        }
-    }
-
-    @Validate
-    public void start() {
-        view = new ScopeTestView(views, helpManager);
-        instancesOfScopeView.add(view);
-        firstCall = true;
-        processWaitList();
-    }
-
-    @Invalidate
-    public void stop() {
-
-    }
-
-    protected void processWaitList() {
-        for (IViewContribution view : viewsInWaitList) {
-            addView(view);
-        }
-        viewsInWaitList.clear();
+    @Override
+    public String getStyle() {
+        return STYLE;
     }
 }

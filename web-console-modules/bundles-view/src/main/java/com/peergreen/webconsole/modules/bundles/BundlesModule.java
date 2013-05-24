@@ -1,12 +1,13 @@
 package com.peergreen.webconsole.modules.bundles;
 
+import com.peergreen.webconsole.core.api.IModuleFactory;
+import com.vaadin.ui.ProgressIndicator;
 import org.apache.felix.ipojo.annotations.Instantiate;
 import org.apache.felix.ipojo.annotations.Provides;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 
-import com.peergreen.webconsole.core.api.IViewContribution;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
@@ -26,10 +27,11 @@ import com.vaadin.ui.VerticalLayout;
 @org.apache.felix.ipojo.annotations.Component
 @Provides
 @Instantiate
-public class BundlesModule implements IViewContribution {
+public class BundlesModule implements IModuleFactory {
 
     private final BundleContext bundleContext;
     private Table table;
+    private ProgressIndicator sample;
 
     public BundlesModule(final BundleContext bundleContext) {
         this.bundleContext = bundleContext;
@@ -55,19 +57,19 @@ public class BundlesModule implements IViewContribution {
         refreshTable();
         verticalLayout.addComponent(table);
 
-        HorizontalLayout horizontalLayout = new HorizontalLayout();
-        horizontalLayout.setSpacing(true);
-
-        Button refreshButton = new NativeButton("Refresh Table");
-        refreshButton.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                refreshTable();
-            }
-        });
-        horizontalLayout.addComponent(refreshButton);
-
-        verticalLayout.addComponent(horizontalLayout);
+//        HorizontalLayout horizontalLayout = new HorizontalLayout();
+//        horizontalLayout.setSpacing(true);
+//
+//        Button refreshButton = new NativeButton("Refresh Table");
+//        refreshButton.addClickListener(new Button.ClickListener() {
+//            @Override
+//            public void buttonClick(Button.ClickEvent event) {
+//                refreshTable();
+//            }
+//        });
+//        horizontalLayout.addComponent(refreshButton);
+//
+//        verticalLayout.addComponent(horizontalLayout);
         return verticalLayout;
     }
 
@@ -103,6 +105,18 @@ public class BundlesModule implements IViewContribution {
                             e1.printStackTrace();
                         }
                     }
+//                    sample.setEnabled(true);
+//                    sample.setVisible(true);
+//                    ((CheckBox) event.getProperty()).setEnabled(false);
+//                    try {
+//                        Thread.sleep(2000);
+//                    } catch (final InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                    sample.setEnabled(false);
+//                    sample.setVisible(false);
+//                    ((CheckBox) event.getProperty()).setEnabled(true);
+
                 }
             });
             table.addItem(
@@ -138,8 +152,12 @@ public class BundlesModule implements IViewContribution {
     }
 
     @Override
+    public String getConsole() {
+        return "pgadmin";
+    }
+
+    @Override
     public String getName() {
         return "Bundles";
     }
-
 }
