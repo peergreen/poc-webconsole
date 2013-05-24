@@ -3,19 +3,26 @@ package com.peergreen.webconsole.core.api;
 import com.vaadin.ui.Component;
 
 /**
- * Created with IntelliJ IDEA.
- * User: mohammed
- * Date: 02/05/13
- * Time: 15:43
- * To change this template use File | Settings | File Templates.
+ * Vaadin module factory
+ * @author Mohammed Boukada
  */
 public interface IModuleFactory {
 
+    /**
+     * Get module view
+     * @return vaadin component
+     */
     public Component getView();
 
+    /**
+     * Get scope name
+     * @return scope name
+     */
     public String getScope();
 
-    public String getConsole();
-
+    /**
+     * Get module name
+     * @return module name
+     */
     public String getName();
 }

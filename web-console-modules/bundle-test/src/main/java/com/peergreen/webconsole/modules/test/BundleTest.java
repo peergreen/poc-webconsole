@@ -34,11 +34,6 @@ public class BundleTest implements IModuleFactory {
     }
 
     @Override
-    public String getConsole() {
-        return "pgadmin";
-    }
-
-    @Override
     public String getName() {
         return "Store Billing";
     }

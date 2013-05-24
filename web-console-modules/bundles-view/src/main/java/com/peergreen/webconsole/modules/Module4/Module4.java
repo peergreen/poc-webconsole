@@ -34,11 +34,6 @@ public class Module4 implements IModuleFactory {
     }
 
     @Override
-    public String getConsole() {
-        return "pgadmin";
-    }
-
-    @Override
     public String getName() {
         return "Shell Manager";
     }

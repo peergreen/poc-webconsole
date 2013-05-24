@@ -114,11 +114,6 @@ public class ServicesModule implements IModuleFactory {
     }
 
     @Override
-    public String getConsole() {
-        return "pgadmin";
-    }
-
-    @Override
     public String getName() {
         return "Services";
     }

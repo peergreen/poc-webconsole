@@ -152,11 +152,6 @@ public class BundlesModule implements IModuleFactory {
     }
 
     @Override
-    public String getConsole() {
-        return "pgadmin";
-    }
-
-    @Override
     public String getName() {
         return "Bundles";
     }

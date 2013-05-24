@@ -37,11 +37,6 @@ public class PeergreenDocumentation implements IModuleFactory {
     }
 
     @Override
-    public String getConsole() {
-        return "pgadmin";
-    }
-
-    @Override
     public String getName() {
         return "Peergreen Documentation";
     }
