@@ -65,20 +65,6 @@ public class ServicesModule implements IModuleFactory {
         refreshTable();
 
         verticalLayout.addComponent(table);
-
-        HorizontalLayout horizontalLayout = new HorizontalLayout();
-        horizontalLayout.setSpacing(true);
-
-        Button refreshButton = new NativeButton("Refresh Table");
-        refreshButton.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                refreshTable();
-            }
-        });
-        horizontalLayout.addComponent(refreshButton);
-
-        verticalLayout.addComponent(horizontalLayout);
         return verticalLayout;
     }
 
