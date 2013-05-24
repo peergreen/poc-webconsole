@@ -1,11 +1,10 @@
-package com.peergreen.webconsole.core.scopes;
+package com.peergreen.webconsole.core.scope;
 
 import com.peergreen.newsfeed.FeedMessage;
 import com.peergreen.newsfeed.Rss;
 import com.peergreen.newsfeed.RssService;
 import com.peergreen.newsfeed.RssServiceException;
-import com.peergreen.webconsole.core.api.IScopeView;
-import com.peergreen.webconsole.core.api.IViewContribution;
+import com.peergreen.webconsole.core.api.IModuleFactory;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
@@ -35,7 +34,7 @@ import java.net.URL;
  * Time: 11:57
  * To change this template use File | Settings | File Templates.
  */
-public class HomeScopeView extends VerticalLayout implements View, IScopeView {
+public class HomeScopeView extends VerticalLayout implements View {
 
     private final static String PEERGREEN_RSS_FLOW_URL = "http://www.peergreen.com/Blog/BlogRss?xpage=plain";
 
@@ -191,15 +190,5 @@ public class HomeScopeView extends VerticalLayout implements View, IScopeView {
 
     private Component getMemoryInformation() {
         return null;
-    }
-
-    @Override
-    public void addView(IViewContribution view) {
-
-    }
-
-    @Override
-    public void removeView(IViewContribution view) {
-
     }
 }
