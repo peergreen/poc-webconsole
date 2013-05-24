@@ -19,38 +19,56 @@ import org.osgi.framework.ServiceReference;
 import java.util.Properties;
 
 /**
- * Created with IntelliJ IDEA.
- * User: mohammed
- * Date: 22/05/13
- * Time: 10:11
- * To change this template use File | Settings | File Templates.
+ * Vaadin UI provider factory
+ * @author Mohammed Boukada
  */
 @Component
 @Instantiate
 @Provides
 public class UIProviderFactory implements IUIProviderFactory {
 
+    /**
+     * Base console UI provider ipojo component factory
+     */
     @Requires(from = "com.peergreen.webconsole.core.vaadin7.UIProviderBase")
     private Factory factory;
 
+    /**
+     * Bundle context
+     */
     private BundleContext bundleContext;
 
+    /**
+     * Vaadin UI provider factory constructor
+     * @param bundleContext
+     */
     public UIProviderFactory(BundleContext bundleContext) {
         this.bundleContext = bundleContext;
     }
 
+    /** {@inheritDoc}
+     */
     @Override
     public UIProvider createUIProvider(IConsole console) {
         UIProvider provider = null;
         try {
+            // Create an instance of base console UI provider
             UIProviderBase newUIProvider = new UIProviderBase(bundleContext);
             newUIProvider.setConsole(console);
+
+            // Configuration properties for ipojo component
             Properties props = new Properties();
+            // Use the instance of baseUI an pojo instance for ipojo component
             props.put("instance.object", newUIProvider);
+
+            // Create ipojo component from its factory
             ComponentInstance instance = factory.createComponentInstance(props);
+
+            // Retrieve service from service reference
             ServiceReference[] refs = bundleContext.getServiceReferences(UIProvider.class.getName(),
                             "(instance.name=" + instance.getInstanceName() +")");
             if (refs != null) {
+                // Gets the created UI provider as an ipojo component
                 provider = (UIProvider) bundleContext.getService(refs[0]);
             }
         } catch (UnacceptableConfiguration unacceptableConfiguration) {

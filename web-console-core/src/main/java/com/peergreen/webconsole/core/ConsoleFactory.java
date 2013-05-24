@@ -17,44 +17,66 @@ import org.osgi.service.http.NamespaceException;
 import javax.servlet.ServletException;
 
 /**
- * Created with IntelliJ IDEA.
- * User: mohammed
- * Date: 22/05/13
- * Time: 10:09
- * To change this template use File | Settings | File Templates.
+ * Console factory
+ * @author Mohammed Boukada
  */
 @Component
 @Instantiate
 public class ConsoleFactory {
 
+    /**
+     * Http Service
+     */
     @Requires
     HttpService httpService;
 
+    /**
+     * UI provider factory
+     */
     @Requires
     IUIProviderFactory uiProviderFactory;
 
+    /**
+     * Resource base
+     */
     final static String RESOURCE_BASE = "/VAADIN";
 
+    /**
+     * Start ipojo component
+     */
     @Validate
     public void start() {
         try {
+            // Register resources
             httpService.registerResources(RESOURCE_BASE, RESOURCE_BASE, null);
         } catch (NamespaceException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Stop ipojo component
+     */
     @Invalidate
     public void stop() {
+        // Unregister resources
         httpService.unregister(RESOURCE_BASE);
     }
 
+    /**
+     * Bind a console
+     * @param console
+     */
     @Bind(aggregate = true, optional = true)
     public void bindConsole(IConsole console) {
+        // Create an UI provider for the console UI
         UIProvider uiProvider = uiProviderFactory.createUIProvider(console);
+
+        // Create a servlet
         VaadinOSGiServlet servlet = new VaadinOSGiServlet(uiProvider);
 
         try {
+            // Register the servlet with the console alias
             httpService.registerServlet(console.getConsoleAlias(), servlet, null, null);
         } catch (ServletException e) {
             e.printStackTrace();
@@ -63,8 +85,13 @@ public class ConsoleFactory {
         }
     }
 
+    /**
+     * Unbind a console
+     * @param console
+     */
     @Unbind(aggregate = true, optional = true)
     public void unbindConsole(IConsole console) {
+        // Unregister its servlet
         httpService.unregister(console.getConsoleAlias());
     }
 }

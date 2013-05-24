@@ -20,48 +20,75 @@ import org.osgi.framework.ServiceReference;
 import java.util.Properties;
 
 /**
- * Created with IntelliJ IDEA.
- * User: mohammed
- * Date: 22/05/13
- * Time: 10:21
- * To change this template use File | Settings | File Templates.
+ * Vaadin Base console UI provider
+ * @author Mohammed Boukada
  */
 @Component
 @Provides(specifications = UIProvider.class)
 public class UIProviderBase extends UIProvider {
 
+    /**
+     * Console
+     */
     private IConsole console;
 
+    /**
+     * Base console UI ipojo component factory
+     */
     @Requires(from = "com.peergreen.webconsole.core.vaadin7.BaseUI")
     private Factory factory;
 
+    /**
+     * Bundle context
+     */
     private BundleContext bundleContext;
 
+    /**
+     * Vaadin base UI provider constructor
+     * @param bundleContext
+     */
     public UIProviderBase(BundleContext bundleContext) {
         this.bundleContext = bundleContext;
     }
 
+    /**
+     * Set console
+     * @param console
+     */
     public void setConsole(IConsole console) {
         this.console = console;
     }
 
+    /** {@inheritDoc}
+     */
     @Override
     public Class<? extends UI> getUIClass(UIClassSelectionEvent event) {
         return BaseUI.class;
     }
 
+    /** {@inheritDoc}
+     */
     @Override
     public UI createInstance(final UICreateEvent e) {
 
         UI ui = null;
         try {
+            // Create an instance of baseUI
             BaseUI newUi = new BaseUI(console.getConsoleName());
+
+            // Configuration properties for ipojo component
             Properties props = new Properties();
+            // Use the instance of baseUI an pojo instance for ipojo component
             props.put("instance.object", newUi);
+
+            // Create ipojo component from its factory
             ComponentInstance instance = factory.createComponentInstance(props);
+
+            // Retrieve service from service reference
             ServiceReference[] refs = bundleContext.getServiceReferences(BaseUI.class.getName(),
                             "(instance.name=" + instance.getInstanceName() +")");
             if (refs != null) {
+                // Gets the created UI as an ipojo component
                 ui = (UI) bundleContext.getService(refs[0]);
             }
         } catch (UnacceptableConfiguration unacceptableConfiguration) {

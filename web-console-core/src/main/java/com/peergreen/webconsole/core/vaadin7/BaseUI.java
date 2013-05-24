@@ -44,11 +44,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Created with IntelliJ IDEA.
- * User: mohammed
- * Date: 22/05/13
- * Time: 11:03
- * To change this template use File | Settings | File Templates.
+ * Base console UI
+ * @author Mohammed Boukada
  */
 @Theme("dashboard")
 @PreserveOnRefresh
@@ -56,38 +53,74 @@ import java.util.concurrent.ConcurrentHashMap;
 @Provides(specifications = BaseUI.class)
 public class BaseUI extends UI {
 
+    /**
+     * Root layout
+     */
     CssLayout root = new CssLayout();
 
+    /**
+     * Login lyout
+     */
     VerticalLayout loginLayout;
 
+    /**
+     * Menu layout
+     */
     CssLayout menu = new CssLayout();
 
+    /**
+     * Content layout
+     */
     CssLayout content = new CssLayout();
 
+    /**
+     * To navigate between scopes views
+     */
     private Navigator nav;
 
+    /**
+     * Scopes bound
+     */
     private ConcurrentHashMap<String, IScopeFactory> scopes = new ConcurrentHashMap<>();
 
+    /**
+     * Scopes views
+     */
     private ConcurrentHashMap<String, View> scopesViews = new ConcurrentHashMap<>();
 
+    /**
+     * Buttons related name
+     */
     private HashMap<String, Button> viewNameToMenuButton = new HashMap<>();
 
+    /**
+     * Console name
+      */
     private String consoleName;
 
+    /**
+     * Whether the UI was built
+     */
     private boolean uiIsBuilt = false;
 
+    /**
+     * Notifier service
+     */
     @Requires
     INotifierService notifierService;
 
+    /**
+     * Base console UI constructor
+     * @param consoleName
+     */
     public BaseUI(String consoleName) {
         this.consoleName = consoleName;
     }
 
-    @Invalidate
-    public void stop() {
-        System.out.println("I'm stopping");
-    }
-
+    /**
+     * Bind a scope factory
+     * @param scope
+     */
     @Bind(aggregate = true, optional = true)
     public void bindScope(IScopeFactory scope) {
         scopes.put(scope.getName(), scope);
@@ -96,6 +129,10 @@ public class BaseUI extends UI {
         addScopeButtonInMenu(scope, true);
     }
 
+    /**
+     * Unbind a scope factory
+     * @param scope
+     */
     @Unbind
     public void unbindScope(IScopeFactory scope) {
         removeRouteFromNav(scope);
@@ -104,6 +141,10 @@ public class BaseUI extends UI {
         scopesViews.remove(scope.getName());
     }
 
+    /**
+     * Init UI
+     * @param request
+     */
     @Override
     protected void init(VaadinRequest request) {
         setLocale(Locale.US);
@@ -121,6 +162,10 @@ public class BaseUI extends UI {
         buildLoginView(false);
     }
 
+    /**
+     * Build login view
+     * @param exit
+     */
     private void buildLoginView(final boolean exit) {
         if (exit) {
             root.removeAllComponents();
@@ -226,6 +271,9 @@ public class BaseUI extends UI {
         loginLayout.setComponentAlignment(loginPanel, Alignment.MIDDLE_CENTER);
     }
 
+    /**
+     * Build main view
+     */
     private void buildMainView() {
 
         uiIsBuilt = true;
@@ -235,6 +283,7 @@ public class BaseUI extends UI {
         removeStyleName("login");
         root.removeComponent(loginLayout);
 
+        // Build menu layout
         root.addComponent(new HorizontalLayout() {
             {
                 setSizeFull();
@@ -356,6 +405,11 @@ public class BaseUI extends UI {
         });
     }
 
+    /**
+     * Format console title
+     * @param title
+     * @return
+     */
     private String formatTitle(String title) {
         String[] words = title.split(" ");
         StringBuilder sb = new StringBuilder();
@@ -368,6 +422,9 @@ public class BaseUI extends UI {
         return sb.toString();
     }
 
+    /**
+     * Clear menu selection
+     */
     private void clearMenuSelection() {
         for (Iterator<Component> it = menu.getComponentIterator(); it.hasNext();) {
             Component next = it.next();
@@ -381,6 +438,9 @@ public class BaseUI extends UI {
         }
     }
 
+    /**
+     * Build navigator routes to scopes views
+     */
     private void buildRoutes() {
         nav = new Navigator(this, content);
         // Build routes
@@ -389,6 +449,10 @@ public class BaseUI extends UI {
         }
     }
 
+    /**
+     * Add route for scope view to navigator
+     * @param scope
+     */
     private void addRouteToNav(IScopeFactory scope) {
         if (nav != null) {
             try {
@@ -404,12 +468,21 @@ public class BaseUI extends UI {
         }
     }
 
+    /**
+     * Remove route for scope view from navigator
+     * @param scope
+     */
     private void removeRouteFromNav(IScopeFactory scope) {
         if (nav != null) {
             nav.removeView("/" + scope.getName());
         }
     }
 
+    /**
+     * Add scope button in menu
+     * @param scope
+     * @param notify for notifierService to show badge
+     */
     private void addScopeButtonInMenu(final IScopeFactory scope, boolean notify) {
 
         if (!uiIsBuilt) {
@@ -442,6 +515,10 @@ public class BaseUI extends UI {
         viewNameToMenuButton.put("/" + scope.getName(), b);
     }
 
+    /**
+     * Remove scope button from menu
+     * @param scope
+     */
     private void removeScopeButtonInMenu(IScopeFactory scope) {
         if (viewNameToMenuButton.containsKey("/" + scope.getName())) {
             //menu.getUI().getSession().getLockInstance().lock();

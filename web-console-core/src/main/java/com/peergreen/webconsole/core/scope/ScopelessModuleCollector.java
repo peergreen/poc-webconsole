@@ -12,21 +12,26 @@ import org.apache.felix.ipojo.annotations.Unbind;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * Created with IntelliJ IDEA.
- * User: mohammed
- * Date: 23/05/13
- * Time: 11:05
- * To change this template use File | Settings | File Templates.
+ * Scopeless modules collector
+ * @author Mohammed Boukada
  */
 @Component
 @Instantiate
 @Provides
 public class ScopelessModuleCollector implements IScopelessModuleCollector {
 
+    /**
+     * Scopeless modules
+     */
     private ConcurrentLinkedQueue<IModuleFactory> modules = new ConcurrentLinkedQueue<>();
 
+    /**
+     * Default scopes view
+     */
     private ConcurrentLinkedQueue<IDefaultScopeTabsView> defaultScopes = new ConcurrentLinkedQueue<>();
 
+    /** {@inheritDoc}
+     */
     @Override
     public void addModule(IModuleFactory moduleFactory) {
         if(!modules.contains(moduleFactory)){
@@ -34,6 +39,8 @@ public class ScopelessModuleCollector implements IScopelessModuleCollector {
         }
     }
 
+    /** {@inheritDoc}
+     */
     @Override
     public void removeModule(IModuleFactory moduleFactory) {
         if (modules.contains(moduleFactory)){
@@ -41,6 +48,8 @@ public class ScopelessModuleCollector implements IScopelessModuleCollector {
         }
     }
 
+    /** {@inheritDoc}
+     */
     @Override
     public void notifyDefaultScopes() {
         for (IDefaultScopeTabsView defaultScope : defaultScopes) {
@@ -48,6 +57,10 @@ public class ScopelessModuleCollector implements IScopelessModuleCollector {
         }
     }
 
+    /**
+     * Bind default scopes
+     * @param defaultScopeTabsView
+     */
     @Bind(aggregate = true, optional = true)
     public void bindDefaultScope(IDefaultScopeTabsView defaultScopeTabsView) {
         if (DefaultScope.SCOPE_NAME.equals(defaultScopeTabsView.getScopeName())) {
@@ -55,6 +68,10 @@ public class ScopelessModuleCollector implements IScopelessModuleCollector {
         }
     }
 
+    /**
+     * Unbind default scopes
+     * @param defaultScopeTabsView
+     */
     @Unbind
     public void unbindDefaultScope(IDefaultScopeTabsView defaultScopeTabsView) {
         if (defaultScopes.contains(defaultScopeTabsView)) {

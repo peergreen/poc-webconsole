@@ -23,11 +23,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * Created with IntelliJ IDEA.
- * User: mohammed
- * Date: 22/05/13
- * Time: 11:58
- * To change this template use File | Settings | File Templates.
+ * Tabs scope view
+ * @author Mohammed Boukada
  */
 @org.apache.felix.ipojo.annotations.Component
 @Provides(specifications = {ScopeTabsView.class, IDefaultScopeTabsView.class})
@@ -44,18 +41,38 @@ public class ScopeTabsView extends CssLayout implements View, IDefaultScopeTabsV
      */
     private ConcurrentHashMap<IModuleFactory, Component> components;
 
+    /**
+     * List of scopes
+     */
     private List<String> scopes;
 
+    /**
+     * Scope name
+     */
     private String scopeName;
 
+    /**
+     * Notifier service
+     */
     @Requires
     private INotifierService notifierService;
 
+    /**
+     * Scopeless modules collector
+     */
     @Requires
     private IScopelessModuleCollector scopelessModuleCollector;
 
+    /**
+     * Whether this view scope is for default scope
+     */
     private boolean isDefaultScope;
 
+    /**
+     * Init tabs scope view
+     * @param scopeName
+     * @param isDefaultScope
+     */
     public ScopeTabsView(String scopeName, boolean isDefaultScope) {
 
         this.scopeName = scopeName;
@@ -80,6 +97,10 @@ public class ScopeTabsView extends CssLayout implements View, IDefaultScopeTabsV
         });
     }
 
+    /**
+     * Bind a new module
+     * @param moduleFactory
+     */
     @Bind(aggregate = true, optional = true)
     public void bindModule(IModuleFactory moduleFactory) {
         if (scopeName.equals(moduleFactory.getScope()) ||
@@ -90,6 +111,10 @@ public class ScopeTabsView extends CssLayout implements View, IDefaultScopeTabsV
         }
     }
 
+    /**
+     * Unbind a module
+     * @param moduleFactory
+     */
     @Unbind
     public void unbindModule(IModuleFactory moduleFactory) {
         if (components.containsKey(moduleFactory)) {
@@ -102,41 +127,46 @@ public class ScopeTabsView extends CssLayout implements View, IDefaultScopeTabsV
         }
     }
 
+    /**
+     * Bind a new scope
+     * @param scopeFactory
+     */
     @Bind(aggregate = true, optional = true)
     public void bindScope(IScopeFactory scopeFactory) {
+        // is this view is for a default scope
         if (isDefaultScope && !scopeName.equals(scopeFactory.getName())) {
             scopes.add(scopeFactory.getName());
+            // A scope was bound, check if its modules are under the default scope
             for (Map.Entry<IModuleFactory, Component> component : components.entrySet()) {
                 if (scopeFactory.getName().equals(component.getKey().getScope())) {
+                    // Remove the module because its scope was bound
                     removeModule(component.getKey());
                 }
             }
         }
     }
 
-//    @Unbind(aggregate = true, optional = true)
-//    public void unbindScope(IScopeFactory scopeFactory) {
-//        if (isDefaultScope && !scopeName.equals(scopeFactory.getName())) {
-//            scopes.remove(scopeFactory.getName());
-//            for (IModuleFactory moduleFactory : scopelessModuleCollector.getModules()) {
-//                addModule(moduleFactory);
-//            }
-//        }
-//    }
-
+    /**
+     * Stop the ipojo component
+     */
     @Invalidate
     public void stop() {
+        // is this views not for a default scope
         if (!DefaultScope.SCOPE_NAME.equals(scopeName)) {
+            // This scope is unbound, add its modules to scopeless modules collector
             for (Map.Entry<IModuleFactory, Component> component : components.entrySet()) {
                 scopelessModuleCollector.addModule(component.getKey());
             }
+            // Notify default scopes that there is scopeless modules
             scopelessModuleCollector.notifyDefaultScopes();
-        } else {
-            System.out.print("");
         }
     }
 
-    public void addModule(IModuleFactory moduleFactory) {
+    /**
+     * Add the module to the scope view
+     * @param moduleFactory
+     */
+    private void addModule(IModuleFactory moduleFactory) {
         if (!components.containsKey(moduleFactory)) {
             Component view = moduleFactory.getView();
             view.setSizeFull();
@@ -152,7 +182,11 @@ public class ScopeTabsView extends CssLayout implements View, IDefaultScopeTabsV
         }
     }
 
-    public void removeModule(IModuleFactory moduleFactory) {
+    /**
+     * Remove the module from the scope view
+     * @param moduleFactory
+     */
+    private void removeModule(IModuleFactory moduleFactory) {
         //tabs.getUI().getSession().getLockInstance().lock();
         try {
             tabs.removeComponent(components.get(moduleFactory));
@@ -162,10 +196,14 @@ public class ScopeTabsView extends CssLayout implements View, IDefaultScopeTabsV
         components.remove(moduleFactory);
     }
 
+    /** {@inheritDoc}
+     */
     public String getScopeName() {
         return scopeName;
     }
 
+    /** {@inheritDoc}
+     */
     @Override
     public void addScopelessModules(ConcurrentLinkedQueue<IModuleFactory> modules) {
         for (IModuleFactory moduleFactory : modules) {
@@ -176,6 +214,8 @@ public class ScopeTabsView extends CssLayout implements View, IDefaultScopeTabsV
         }
     }
 
+    /** {@inheritDoc}
+     */
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {
 

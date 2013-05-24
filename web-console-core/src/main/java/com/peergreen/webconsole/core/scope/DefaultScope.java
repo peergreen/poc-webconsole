@@ -9,7 +9,7 @@ import org.apache.felix.ipojo.annotations.Provides;
 import org.apache.felix.ipojo.annotations.Requires;
 
 /**
- * Default scope provider
+ * Default scope factory
  * @author Mohammed Boukada
  */
 @Component
@@ -17,23 +17,38 @@ import org.apache.felix.ipojo.annotations.Requires;
 @Provides
 public class DefaultScope implements IScopeFactory {
 
+    /**
+     * Default scope name
+     */
     public final static String SCOPE_NAME = "others";
 
+    /**
+     * Default scope button style
+     */
     final static String STYLE = "icon-dashboard";
 
+    /**
+     * Tabs scope view factory
+     */
     @Requires
     IScopeTabsFactory scopeTabsFactory;
 
+    /** {@inheritDoc}
+     */
     @Override
     public String getName() {
         return SCOPE_NAME;
     }
 
+    /** {@inheritDoc}
+     */
     @Override
     public View getView() {
         return scopeTabsFactory.createInstance(SCOPE_NAME, true);
     }
 
+    /** {@inheritDoc}
+     */
     @Override
     public String getStyle() {
         return STYLE;

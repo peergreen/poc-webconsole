@@ -3,16 +3,24 @@ package com.peergreen.webconsole.core.api;
 import com.vaadin.navigator.View;
 
 /**
- * Created with IntelliJ IDEA.
- * User: mohammed
- * Date: 22/05/13
- * Time: 11:57
- * To change this template use File | Settings | File Templates.
+ * Tabs scope factory
+ * @author Mohammed Boukada
  */
 public interface IScopeTabsFactory {
 
+    /**
+     * Create an instance of tabs view
+     * @param scopeName
+     * @return
+     */
     View createInstance(String scopeName);
 
+    /**
+     * Create an instance of tabs view for default scope
+     * @param scopeName
+     * @param isDefaultScope
+     * @return
+     */
     View createInstance(String scopeName, boolean isDefaultScope);
 
 }

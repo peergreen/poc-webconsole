@@ -28,14 +28,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * Created with IntelliJ IDEA.
- * User: mohammed
- * Date: 14/05/13
- * Time: 11:57
- * To change this template use File | Settings | File Templates.
+ * Home scope view
  */
 public class HomeScopeView extends VerticalLayout implements View {
 
+    /**
+     * Peergreen rss flow url
+     */
     private final static String PEERGREEN_RSS_FLOW_URL = "http://www.peergreen.com/Blog/BlogRss?xpage=plain";
 
     public HomeScopeView(RssService rssService) {
@@ -77,6 +76,11 @@ public class HomeScopeView extends VerticalLayout implements View {
     public void enter(ViewChangeListener.ViewChangeEvent event) {
     }
 
+    /**
+     * Creat a panel
+     * @param content
+     * @return
+     */
     private CssLayout createPanel(Component content) {
         CssLayout panel = new CssLayout();
         panel.addStyleName("layout-panel");
@@ -86,6 +90,11 @@ public class HomeScopeView extends VerticalLayout implements View {
         return panel;
     }
 
+    /**
+     * Peergreen news feed panel
+     * @param rssService
+     * @return
+     */
     private Component peergreenNewsFeed(RssService rssService) {
         Rss rss = null;
         try {
@@ -130,6 +139,11 @@ public class HomeScopeView extends VerticalLayout implements View {
         return t;
     }
 
+    /**
+     * News popup
+     * @param feedMessage
+     * @return
+     */
     private Window getNewsDescription(FeedMessage feedMessage) {
         final Window w = new Window();
         VerticalLayout l = new VerticalLayout();

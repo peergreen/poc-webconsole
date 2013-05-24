@@ -3,16 +3,21 @@ package com.peergreen.webconsole.core.api;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * Created with IntelliJ IDEA.
- * User: mohammed
- * Date: 24/05/13
- * Time: 09:35
- * To change this template use File | Settings | File Templates.
+ * Default scope view
+ * @author Mohammed Boukada
  */
 public interface IDefaultScopeTabsView {
 
+    /**
+     * Get scope name
+     * @return
+     */
     String getScopeName();
 
+    /**
+     * Add scopeless modules to default scopes
+     * @param modules
+     */
     void addScopelessModules(ConcurrentLinkedQueue<IModuleFactory> modules);
 
 }

@@ -1,15 +1,20 @@
 package com.peergreen.webconsole.core.api;
 
 /**
- * Created with IntelliJ IDEA.
- * User: mohammed
- * Date: 22/05/13
- * Time: 10:04
- * To change this template use File | Settings | File Templates.
+ * Console definition
+ * @author Mohammed Boukada
  */
 public interface IConsole {
 
+    /**
+     * Get console name
+     * @return console name
+     */
     String getConsoleName();
 
+    /**
+     * Get console alias
+     * @return console alias
+     */
     String getConsoleAlias();
 }

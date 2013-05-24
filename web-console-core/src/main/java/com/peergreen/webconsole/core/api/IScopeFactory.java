@@ -22,5 +22,9 @@ public interface IScopeFactory {
      */
     View getView();
 
+    /**
+     * Get scope button style
+     * @return scope button style
+     */
     String getStyle();
 }

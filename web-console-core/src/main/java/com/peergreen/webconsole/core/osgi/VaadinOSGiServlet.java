@@ -8,14 +8,28 @@ import com.vaadin.server.UIProvider;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.VaadinServletService;
 
+/**
+ * Vaadin OSGi Servlet
+ * to add Vaadin UI provider dynamically
+ * @author Mohammed Boukada
+ */
 public class VaadinOSGiServlet extends VaadinServlet {
 
+    /**
+     * Vaadin UI provider
+     */
     UIProvider provider;
 
+    /**
+     * Vaadin OSGi Servlet constructor
+     * @param provider
+     */
     public VaadinOSGiServlet(UIProvider provider) {
         this.provider = provider;
     }
 
+    /** {@inheritDoc}
+     */
     @Override
     protected VaadinServletService createServletService(DeploymentConfiguration deploymentConfiguration) throws ServiceException {
 
@@ -26,6 +40,7 @@ public class VaadinOSGiServlet extends VaadinServlet {
 
             @Override
             public void sessionInit(SessionInitEvent e) throws ServiceException {
+                // Add Vaadin UI provider to the Vaadin session
                 e.getSession().addUIProvider(provider);
             }
          });

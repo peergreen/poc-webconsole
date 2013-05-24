@@ -3,13 +3,15 @@ package com.peergreen.webconsole.core.api;
 import com.vaadin.server.UIProvider;
 
 /**
- * Created with IntelliJ IDEA.
- * User: mohammed
- * Date: 22/05/13
- * Time: 10:08
- * To change this template use File | Settings | File Templates.
+ * Vaadin UI provider factory
+ * @author Mohammed Boukada
  */
 public interface IUIProviderFactory {
 
+    /**
+     * Create an UI provider for a console
+     * @param console
+     * @return
+     */
     UIProvider createUIProvider(IConsole console);
 }

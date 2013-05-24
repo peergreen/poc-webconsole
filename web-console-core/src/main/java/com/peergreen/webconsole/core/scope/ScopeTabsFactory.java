@@ -27,36 +27,53 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * Created with IntelliJ IDEA.
- * User: mohammed
- * Date: 22/05/13
- * Time: 11:57
- * To change this template use File | Settings | File Templates.
+ * Tabs scope factory
+ * @author Mohammed Boukada
  */
 @Component
 @Instantiate
 @Provides
 public class ScopeTabsFactory implements IScopeTabsFactory {
 
+    /**
+     * Notifier service
+     */
     @Requires
     INotifierService notifierService;
 
+    /**
+     * Scope tabs view ipojo component factory
+     */
     @Requires(from = "com.peergreen.webconsole.core.scope.ScopeTabsView")
     private Factory factory;
 
+    /**
+     * Bundle context
+     */
     private BundleContext bundleContext;
 
+    /**
+     * Ipojo component instances of each scope tabs view
+     */
     private ConcurrentHashMap<String, ConcurrentLinkedQueue<ComponentInstance>> instances = new ConcurrentHashMap<>();
 
+    /**
+     * Scope tabs view constructor
+     * @param bundleContext
+     */
     public ScopeTabsFactory(BundleContext bundleContext) {
         this.bundleContext = bundleContext;
     }
 
+    /** {@inheritDoc}
+     */
     @Override
     public View createInstance(String scopeName) {
         return createInstance(scopeName, false);
     }
 
+    /** {@inheritDoc}
+     */
     @Override
     public View createInstance(String scopeName, boolean isDefaultScope) {
         ScopeTabsView scope = null;
@@ -84,6 +101,10 @@ public class ScopeTabsFactory implements IScopeTabsFactory {
         return scope;
     }
 
+    /**
+     * Stop scope ipojo component instances
+     * @param scopeName
+     */
     private void stopScopeInstances(String scopeName) {
         for (ComponentInstance instance : instances.get(scopeName)) {
             instance.dispose();
@@ -91,11 +112,16 @@ public class ScopeTabsFactory implements IScopeTabsFactory {
         instances.remove(scopeName);
     }
 
+    //TODO useless but required for ipojo
     @Bind(aggregate = true, optional = true)
     public void bindScope(IScopeFactory scopeFactory) {
 
     }
 
+    /**
+     * Unbind a scope factory
+     * @param scopeFactory
+     */
     @Unbind
     public void unbindScope(IScopeFactory scopeFactory) {
         try {
@@ -107,6 +133,11 @@ public class ScopeTabsFactory implements IScopeTabsFactory {
         }
     }
 
+    /**
+     * Add ipojo component instance for a scope
+     * @param scopeName
+     * @param instance
+     */
     private void addInstance(String scopeName, ComponentInstance instance) {
         ConcurrentLinkedQueue<ComponentInstance> componentInstances;
         if (instances.containsKey(scopeName)) {

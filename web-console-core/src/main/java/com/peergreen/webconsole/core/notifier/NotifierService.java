@@ -1,11 +1,11 @@
 /**
  * DISCLAIMER
- * 
+ *
  * The quality of the code is such that you should not copy any of it as best
  * practice how to build Vaadin applications.
- * 
+ *
  * @author jouni@vaadin.com
- * 
+ *
  */
 
 package com.peergreen.webconsole.core.notifier;
@@ -25,17 +25,33 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+/**
+ * Notifier service
+ * @author Mohammed Boukada
+ */
 @Component
 @Provides
 @Instantiate
 public class NotifierService implements INotifierService {
 
-    private List<NotificationOverlay> overlays = new ArrayList<NotificationOverlay>();
+    /**
+     * List of overlays
+     */
+    private List<NotificationOverlay> overlays = new ArrayList<>();
 
+    /**
+     * Badges for each scope button
+     */
     private ConcurrentHashMap<View, Integer> badges = new ConcurrentHashMap<>();
 
+    /**
+     * Scope buttons in each view
+     */
     private ConcurrentHashMap<View, Button> scopesButtons = new ConcurrentHashMap<>();
 
+    /**
+     * Close all overlays
+     */
     public void closeAll() {
         for (NotificationOverlay overlay : overlays) {
             overlay.close();
@@ -43,11 +59,15 @@ public class NotifierService implements INotifierService {
         overlays.clear();
     }
 
+    /** {@inheritDoc}
+     */
     @Override
     public void addNotification(String notification) {
         Notification.show(notification);
     }
 
+    /** {@inheritDoc}
+     */
     public NotificationOverlay addOverlay(String caption, String text, String style) {
         NotificationOverlay o = new NotificationOverlay();
         o.setCaption(caption);
@@ -57,6 +77,8 @@ public class NotifierService implements INotifierService {
         return o;
     }
 
+    /** {@inheritDoc}
+     */
     public void addScopeButton(View scope, Button button, boolean notify) {
         scopesButtons.put(scope, button);
         badges.put(scope, 0);
@@ -65,6 +87,8 @@ public class NotifierService implements INotifierService {
         }
     }
 
+    /** {@inheritDoc}
+     */
     public void removeScopeButton(View scope) {
         if (scopesButtons.containsKey(scope)) {
             scopesButtons.remove(scope);
@@ -72,18 +96,24 @@ public class NotifierService implements INotifierService {
         }
     }
 
+    /** {@inheritDoc}
+     */
     public void hideScopeButton(View scope) {
         if (scopesButtons.containsKey(scope)) {
             scopesButtons.get(scope).setVisible(false);
         }
     }
 
+    /** {@inheritDoc}
+     */
     public void removeBadge(View scope) {
         updateBadge(scope, 0);
         scopesButtons.get(scope).setHtmlContentAllowed(true);
         scopesButtons.get(scope).setCaption(getInitialCaption(scopesButtons.get(scope)));
     }
 
+    /** {@inheritDoc}
+     */
     public void incrementBadge(View scope) {
         if (scopesButtons.containsKey(scope)) {
             updateBadge(scope, +1);
@@ -95,6 +125,8 @@ public class NotifierService implements INotifierService {
         }
     }
 
+    /** {@inheritDoc}
+     */
     public void decrementBadge(View scope) {
         if (scopesButtons.containsKey(scope)) {
             updateBadge(scope, -1);
@@ -105,13 +137,22 @@ public class NotifierService implements INotifierService {
         }
     }
 
-    public void setBadgeAsNew(Button button) {
+    /**
+     * Set badge as new
+     * @param button
+     */
+    private void setBadgeAsNew(Button button) {
         button.setHtmlContentAllowed(true);
         String newCaption = getInitialCaption(button) +
                 "<span class=\"badge\">new</span>";
         button.setCaption(newCaption);
     }
 
+    /**
+     * Update badge when it is changed
+     * @param scope
+     * @param op
+     */
     private void updateBadge(View scope, int op) {
         if (badges.containsKey(scope)) {
             Integer badge = badges.get(scope);
@@ -126,6 +167,11 @@ public class NotifierService implements INotifierService {
         }
     }
 
+    /**
+     * Get initial caption of the button
+     * @param button
+     * @return
+     */
     private String getInitialCaption(Button button) {
         if (button.getCaption().indexOf("<span") != -1) {
             return button.getCaption().substring(0, button.getCaption().indexOf("<span"));
