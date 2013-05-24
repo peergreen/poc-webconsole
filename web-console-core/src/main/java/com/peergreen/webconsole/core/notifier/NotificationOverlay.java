@@ -1,14 +1,12 @@
-package com.peergreen.webconsole.core.vaadin7;
+package com.peergreen.webconsole.core.notifier;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Window;
 
-import java.io.Serializable;
+public class NotificationOverlay extends Window {
 
-public class HelpOverlay extends Window {
-
-    public HelpOverlay() {
+    public NotificationOverlay() {
         setContent(new CssLayout());
         setPrimaryStyleName("help-overlay");
         setDraggable(false);
