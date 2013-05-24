@@ -28,6 +28,7 @@ public class PeergreenDocumentation implements IModuleFactory {
                 new ExternalResource("http://docs.peergreen.com/peergreen_server/latest/reference/xhtml-single/user-guide.xhtml"));
         browser.setSizeFull();
         verticalLayout.addComponent(browser);
+        verticalLayout.setExpandRatio(browser, 1.5f);
         return verticalLayout;
     }
 

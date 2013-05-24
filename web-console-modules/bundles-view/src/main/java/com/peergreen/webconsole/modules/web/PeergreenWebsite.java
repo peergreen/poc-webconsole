@@ -28,6 +28,7 @@ public class PeergreenWebsite implements IModuleFactory {
                 new ExternalResource("http://www.peergreen.com/"));
         browser.setSizeFull();
         verticalLayout.addComponent(browser);
+        verticalLayout.setExpandRatio(browser, 1.5f);
         return verticalLayout;
     }
 
