@@ -9,11 +9,13 @@ import com.vaadin.ui.Component;
  * Time: 15:43
  * To change this template use File | Settings | File Templates.
  */
-public interface IViewContribution {
+public interface IModuleFactory {
 
     public Component getView();
 
     public String getScope();
+
+    public String getConsole();
 
     public String getName();
 }
