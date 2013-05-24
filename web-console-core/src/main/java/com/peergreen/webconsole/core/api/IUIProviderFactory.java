@@ -1,16 +1,15 @@
 package com.peergreen.webconsole.core.api;
 
+import com.vaadin.server.UIProvider;
+
 /**
  * Created with IntelliJ IDEA.
  * User: mohammed
- * Date: 14/05/13
- * Time: 17:03
+ * Date: 22/05/13
+ * Time: 10:08
  * To change this template use File | Settings | File Templates.
  */
-public interface IVaadinUI extends IUiManager {
+public interface IUIProviderFactory {
 
-    void addScope(IScopeProvider scope);
-
-    void removeScope(IScopeProvider scope);
-
+    UIProvider createUIProvider(IConsole console);
 }

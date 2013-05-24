@@ -1,14 +1,16 @@
 package com.peergreen.webconsole.core.vaadin7;
 
-import com.peergreen.webconsole.core.api.IHelpManager;
-import com.peergreen.webconsole.core.api.IScopeProvider;
-import com.peergreen.webconsole.core.api.IVaadinUI;
-import com.peergreen.webconsole.core.scopes.ScopeExceptionView;
+import com.peergreen.webconsole.core.api.INotifierService;
+import com.peergreen.webconsole.core.api.IScopeFactory;
+import com.peergreen.webconsole.core.notifier.NotificationOverlay;
+import com.peergreen.webconsole.core.scope.DefaultScope;
+import com.peergreen.webconsole.core.scope.HomeScope;
+import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Theme;
-import com.vaadin.annotations.Title;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.navigator.Navigator;
+import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.Page;
 import com.vaadin.server.ThemeResource;
@@ -29,27 +31,30 @@ import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import org.apache.felix.ipojo.annotations.Bind;
+import org.apache.felix.ipojo.annotations.Invalidate;
+import org.apache.felix.ipojo.annotations.Provides;
+import org.apache.felix.ipojo.annotations.Requires;
+import org.apache.felix.ipojo.annotations.Unbind;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created with IntelliJ IDEA.
  * User: mohammed
- * Date: 07/05/13
- * Time: 17:27
+ * Date: 22/05/13
+ * Time: 11:03
  * To change this template use File | Settings | File Templates.
  */
-
 @Theme("dashboard")
-@Title("Peergreen Administration Console")
-//@Push
-public class MainUI extends UI implements IVaadinUI {
+@PreserveOnRefresh
+@org.apache.felix.ipojo.annotations.Component
+@Provides(specifications = BaseUI.class)
+public class BaseUI extends UI {
 
     CssLayout root = new CssLayout();
 
@@ -59,44 +64,51 @@ public class MainUI extends UI implements IVaadinUI {
 
     CssLayout content = new CssLayout();
 
-    private static final long serialVersionUID = -7333618595654346783L;
-
-    private IHelpManager helpManager;
-
     private Navigator nav;
 
-    private HashMap<String, IScopeProvider> scopes = new HashMap<>();
+    private ConcurrentHashMap<String, IScopeFactory> scopes = new ConcurrentHashMap<>();
+
+    private ConcurrentHashMap<String, View> scopesViews = new ConcurrentHashMap<>();
 
     private HashMap<String, Button> viewNameToMenuButton = new HashMap<>();
 
-    private String selectedView = "";
+    private String consoleName;
 
-    private String mainScope = "";
+    private boolean uiIsBuilt = false;
 
-    private BadRequestView badRequestView;
+    @Requires
+    INotifierService notifierService;
 
-    public MainUI(List<IScopeProvider> scopes, IHelpManager helpManager, String mainScope) {
-        this.helpManager = helpManager;
-        this.mainScope = mainScope;
-        for (IScopeProvider scope : scopes) {
-            this.scopes.put(scope.getName(), scope);
-        }
-        badRequestView = new BadRequestView();
+    public BaseUI(String consoleName) {
+        this.consoleName = consoleName;
     }
 
-    private List<String> buttonStyles = new ArrayList<String>() {{
-        add("icon-dashboard");
-        add("icon-sales");
-        add("icon-schedule");
-        add("icon-reports");
-        add("icon-transactions");
-    }};
+    @Invalidate
+    public void stop() {
+        System.out.println("I'm stopping");
+    }
+
+    @Bind(aggregate = true, optional = true)
+    public void bindScope(IScopeFactory scope) {
+        scopes.put(scope.getName(), scope);
+        scopesViews.put(scope.getName(), scope.getView());
+        addRouteToNav(scope);
+        addScopeButtonInMenu(scope, true);
+    }
+
+    @Unbind
+    public void unbindScope(IScopeFactory scope) {
+        removeRouteFromNav(scope);
+        removeScopeButtonInMenu(scope);
+        scopes.remove(scope.getName());
+        scopesViews.remove(scope.getName());
+    }
 
     @Override
-    protected void init(final VaadinRequest request) {
-
+    protected void init(VaadinRequest request) {
         setLocale(Locale.US);
 
+        getPage().setTitle(consoleName);
         setContent(root);
         root.addStyleName("root");
         root.setSizeFull();
@@ -107,18 +119,17 @@ public class MainUI extends UI implements IVaadinUI {
         root.addComponent(bg);
 
         buildLoginView(false);
-
     }
 
     private void buildLoginView(final boolean exit) {
         if (exit) {
             root.removeAllComponents();
         }
-        helpManager.closeAll();
-        HelpOverlay w = helpManager
+        notifierService.closeAll();
+        NotificationOverlay w = notifierService
                 .addOverlay(
                         "",
-                        "Welcome to Peergreen Administration Console",
+                        "Welcome to " + consoleName,
                         "login");
         w.center();
         addWindow(w);
@@ -145,7 +156,7 @@ public class MainUI extends UI implements IVaadinUI {
         labels.addComponent(welcome);
         labels.setComponentAlignment(welcome, Alignment.MIDDLE_LEFT);
 
-        Label title = new Label("Administration Console");
+        Label title = new Label(consoleName);
         title.setSizeUndefined();
         title.addStyleName("h2");
         title.addStyleName("light");
@@ -217,9 +228,10 @@ public class MainUI extends UI implements IVaadinUI {
 
     private void buildMainView() {
 
+        uiIsBuilt = true;
         buildRoutes();
 
-        helpManager.closeAll();
+        notifierService.closeAll();
         removeStyleName("login");
         root.removeComponent(loginLayout);
 
@@ -239,7 +251,7 @@ public class MainUI extends UI implements IVaadinUI {
                             {
                                 addStyleName("branding");
                                 Label logo = new Label(
-                                        "<span>Administration</span> Console",
+                                        formatTitle(consoleName),
                                         ContentMode.HTML);
                                 logo.setSizeUndefined();
                                 addComponent(logo);
@@ -310,8 +322,9 @@ public class MainUI extends UI implements IVaadinUI {
 
         menu.removeAllComponents();
 
-        for(final Map.Entry<String, IScopeProvider> scope : scopes.entrySet()) {
-            addScopeButtonInMenu(scope.getKey());
+        // Add Menu buttons
+        for(final Map.Entry<String, IScopeFactory> scope : scopes.entrySet()) {
+            addScopeButtonInMenu(scope.getValue(), false);
         }
 
         menu.addStyleName("menu");
@@ -322,23 +335,18 @@ public class MainUI extends UI implements IVaadinUI {
             f = f.substring(1);
         }
         if (f == null || f.equals("") || f.equals("/")) {
-            nav.navigateTo("/" + mainScope);
-            viewNameToMenuButton.get("/" + mainScope).addStyleName("selected");
-            selectedView = "/" + mainScope;
-        } else if (viewNameToMenuButton.containsKey(f)) {
+            nav.navigateTo("/home");
+            viewNameToMenuButton.get("/home").addStyleName("selected");
+        } else {
             nav.navigateTo(f);
             viewNameToMenuButton.get(f).addStyleName("selected");
-            selectedView = f;
-        } else {
-            badRequestView.setBadRequest(f.substring(1));
-            nav.navigateTo("/badrequest");
         }
 
         nav.addViewChangeListener(new ViewChangeListener() {
 
             @Override
             public boolean beforeViewChange(ViewChangeEvent event) {
-                helpManager.closeAll();
+                notifierService.closeAll();
                 return true;
             }
 
@@ -346,6 +354,18 @@ public class MainUI extends UI implements IVaadinUI {
             public void afterViewChange(ViewChangeEvent event) {
             }
         });
+    }
+
+    private String formatTitle(String title) {
+        String[] words = title.split(" ");
+        StringBuilder sb = new StringBuilder();
+        sb.append("<center><span>");
+        for (int i = 0; i < words.length; i++) {
+            sb.append(words[i]);
+            sb.append("<br />");
+        }
+        sb.append("</span></center>");
+        return sb.toString();
     }
 
     private void clearMenuSelection() {
@@ -364,130 +384,74 @@ public class MainUI extends UI implements IVaadinUI {
     private void buildRoutes() {
         nav = new Navigator(this, content);
         // Build routes
-        for (Map.Entry<String, IScopeProvider> scope : scopes.entrySet()) {
+        for (Map.Entry<String, IScopeFactory> scope : scopes.entrySet()) {
             addRouteToNav(scope.getValue());
         }
-        nav.addView("/badrequest", badRequestView);
     }
 
-    private void addRouteToNav(IScopeProvider scope) {
+    private void addRouteToNav(IScopeFactory scope) {
         if (nav != null) {
             try {
                 nav.removeView("/" + scope.getName());
-                nav.addView("/" + scope.getName(), scope.getView());
+                nav.addView("/" + scope.getName(), scopesViews.get(scope.getName()));
+                if (DefaultScope.SCOPE_NAME.equals(scope.getName())) {
+                    nav.addView("", scopesViews.get(scope.getName()));
+                    nav.addView("/", scopesViews.get(scope.getName()));
+                }
             } catch (Exception e) {
-                nav.addView("/" + scope.getName(), new ScopeExceptionView(e));
+                e.printStackTrace();
             }
         }
     }
 
-    private void removeRouteFromNav(IScopeProvider scope) {
+    private void removeRouteFromNav(IScopeFactory scope) {
         if (nav != null) {
             nav.removeView("/" + scope.getName());
         }
     }
 
-    @Override
-    public void addScope(IScopeProvider scope) {
-        scopes.put(scope.getName(), scope);
+    private void addScopeButtonInMenu(final IScopeFactory scope, boolean notify) {
 
-        addRouteToNav(scope);
-
-        updateScopeMenuButton(scope.getName());
-
-        updateScopeBadge(scope.getName());
-    }
-
-    @Override
-    public void removeScope(IScopeProvider scope) {
-        scopes.remove(scope.getName());
-
-        removeRouteFromNav(scope);
-
-        updateScopeMenuButton(scope.getName());
-    }
-
-    @Override
-    public void setMainScope(String scopeName) {
-        mainScope = scopeName;
-    }
-
-    public void updateScopeMenuButton(String scopeName) {
-
-        if (viewNameToMenuButton.containsKey("/" + scopeName)) {
-            if (!scopes.containsKey(scopeName)) {
-                // this scope was removed, remove its button from menu
-                menu.removeComponent(viewNameToMenuButton.get("/" + scopeName));
-                viewNameToMenuButton.remove("/" + scopeName);
-                return; // exit this method to avoid following tests
-            }
-            if (scopes.get(scopeName).getViewsInScope().isEmpty()) {
-                // this scope is empty, hide it
-                viewNameToMenuButton.get("/" + scopeName).setVisible(false);
-            }
-            if (!viewNameToMenuButton.get("/" + scopeName).isVisible()
-                    && !scopes.get(scopeName).getViewsInScope().isEmpty()) {
-                // a view was added to a hidden scope, show it
-                viewNameToMenuButton.get("/" + scopeName).setVisible(true);
-            }
-        } else {
-            // new scope
-            addScopeButtonInMenu(scopeName);
-        }
-    }
-
-    private void addScopeButtonInMenu(final String scopeName) {
-        if (!scopes.containsKey(scopeName)) {
+        if (!uiIsBuilt) {
             return;
         }
 
-        final Button b = new NativeButton(scopeName.toUpperCase());
+        final Button b = new NativeButton(scope.getName().toUpperCase());
 
-        if (mainScope.equals(scopeName)) {
-            b.addStyleName("icon-dashboard");
-        } else {
-            String style = buttonStyles.get(new Random().nextInt(buttonStyles.size()));
-            b.addStyleName(style);
-        }
+        b.addStyleName(scope.getStyle());
 
         b.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 clearMenuSelection();
-                removeScopeBadge(scopeName);
-                scopes.get(scopeName).setBadge(0);
+                notifierService.removeBadge(scopesViews.get(scope.getName()));
                 event.getButton().addStyleName("selected");
-                selectedView = "/" + scopeName;
-                if (!nav.getState().equals("/" + scopeName))
-                    nav.navigateTo("/" + scopeName);
+                if (!nav.getState().equals("/" + scope.getName()))
+                    nav.navigateTo("/" + scope.getName());
             }
         });
-
-        menu.addComponent(b);
-
-        if (!mainScope.equals(scopeName) && scopes.get(scopeName).getViewsInScope().isEmpty()) {
-            b.setVisible(false);
+        menu.getUI().getSession().getLockInstance().lock();
+        try {
+            menu.addComponent(b);
+        } finally {
+            menu.getUI().getSession().getLockInstance().unlock();
         }
 
-        viewNameToMenuButton.put("/" + scopeName, b);
+        notifierService.addScopeButton(scopesViews.get(scope.getName()), b, notify);
+
+        viewNameToMenuButton.put("/" + scope.getName(), b);
     }
 
-    public void updateScopeBadge(String scopeName) {
-        if (!viewNameToMenuButton.containsKey("/" + scopeName)) {
-            return;
+    private void removeScopeButtonInMenu(IScopeFactory scope) {
+        if (viewNameToMenuButton.containsKey("/" + scope.getName())) {
+            //menu.getUI().getSession().getLockInstance().lock();
+            try {
+                menu.removeComponent(viewNameToMenuButton.get("/" + scope.getName()));
+            } finally {
+                //menu.getUI().getSession().getLockInstance().unlock();
+            }
+            viewNameToMenuButton.remove("/" + scope.getName());
+            notifierService.removeScopeButton(scopesViews.get(scope.getName()));
         }
-
-        if (!selectedView.equals("/" + scopeName)) {
-            viewNameToMenuButton.get("/" + scopeName).setHtmlContentAllowed(true);
-            viewNameToMenuButton.get("/" + scopeName).setCaption(scopeName.toUpperCase() +
-                                ((scopes.get(scopeName).getBadge() <= 0)?"":"<span class=\"badge\">" +
-                                scopes.get(scopeName).getBadge() +"</span>"));
-        }
     }
-
-    private void removeScopeBadge(String scopeName) {
-        viewNameToMenuButton.get("/" + scopeName).setHtmlContentAllowed(true);
-        viewNameToMenuButton.get("/" + scopeName).setCaption(scopeName.toUpperCase());
-    }
-
 }
