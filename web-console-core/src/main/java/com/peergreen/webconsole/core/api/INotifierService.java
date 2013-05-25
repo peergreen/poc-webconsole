@@ -3,6 +3,7 @@ package com.peergreen.webconsole.core.api;
 import com.peergreen.webconsole.core.notifier.NotificationOverlay;
 import com.vaadin.navigator.View;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
 
 /**
  * Notifier service
@@ -25,37 +26,37 @@ public interface INotifierService {
      * @param button
      * @param notify
      */
-    void addScopeButton(View scope, Button button, boolean notify);
+    void addScopeButton(Component scope, Button button, boolean notify);
 
     /**
      * Remove scope button reference
      * @param scope
      */
-    void removeScopeButton(View scope);
+    void removeScopeButton(Component scope);
 
     /**
      * Hide scope button from menu
      * @param scope
      */
-    void hideScopeButton(View scope);
+    void hideScopeButton(Component scope);
 
     /**
      * Remove badge from scope button in menu
      * @param scope
      */
-    void removeBadge(View scope);
+    void removeBadge(Component scope);
 
     /**
      * Increment badge in scope button in menu
      * @param scope
      */
-    void incrementBadge(View scope);
+    void incrementBadge(Component scope);
 
     /**
      * Decrement badge in scope button in menu
      * @param scope
      */
-    void decrementBadge(View scope);
+    void decrementBadge(Component scope);
 
     /**
      * Close all overlays

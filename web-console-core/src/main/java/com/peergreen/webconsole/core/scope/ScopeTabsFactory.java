@@ -68,14 +68,14 @@ public class ScopeTabsFactory implements IScopeTabsFactory {
     /** {@inheritDoc}
      */
     @Override
-    public View createInstance(String scopeName) {
+    public com.vaadin.ui.Component createInstance(String scopeName) {
         return createInstance(scopeName, false);
     }
 
     /** {@inheritDoc}
      */
     @Override
-    public View createInstance(String scopeName, boolean isDefaultScope) {
+    public com.vaadin.ui.Component createInstance(String scopeName, boolean isDefaultScope) {
         ScopeTabsView scope = null;
         try {
             ScopeTabsView scopeTabsView = new ScopeTabsView(scopeName, isDefaultScope);

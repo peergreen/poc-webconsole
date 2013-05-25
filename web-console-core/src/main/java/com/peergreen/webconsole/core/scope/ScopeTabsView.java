@@ -5,6 +5,7 @@ import com.peergreen.webconsole.core.api.IModuleFactory;
 import com.peergreen.webconsole.core.api.INotifierService;
 import com.peergreen.webconsole.core.api.IScopeFactory;
 import com.peergreen.webconsole.core.api.IScopelessModuleCollector;
+import com.peergreen.webconsole.core.exception.ExceptionView;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.ui.Component;
@@ -28,7 +29,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 @org.apache.felix.ipojo.annotations.Component
 @Provides(specifications = {ScopeTabsView.class, IDefaultScopeTabsView.class})
-public class ScopeTabsView extends CssLayout implements View, IDefaultScopeTabsView {
+public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
 
     /*
         List of modules tabs in this scope
@@ -212,12 +213,5 @@ public class ScopeTabsView extends CssLayout implements View, IDefaultScopeTabsV
             }
             addModule(moduleFactory);
         }
-    }
-
-    /** {@inheritDoc}
-     */
-    @Override
-    public void enter(ViewChangeListener.ViewChangeEvent event) {
-
     }
 }

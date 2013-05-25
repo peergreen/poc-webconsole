@@ -42,12 +42,12 @@ public class NotifierService implements INotifierService {
     /**
      * Badges for each scope button
      */
-    private ConcurrentHashMap<View, Integer> badges = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<com.vaadin.ui.Component, Integer> badges = new ConcurrentHashMap<>();
 
     /**
      * Scope buttons in each view
      */
-    private ConcurrentHashMap<View, Button> scopesButtons = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<com.vaadin.ui.Component, Button> scopesButtons = new ConcurrentHashMap<>();
 
     /**
      * Close all overlays
@@ -79,7 +79,7 @@ public class NotifierService implements INotifierService {
 
     /** {@inheritDoc}
      */
-    public void addScopeButton(View scope, Button button, boolean notify) {
+    public void addScopeButton(com.vaadin.ui.Component scope, Button button, boolean notify) {
         scopesButtons.put(scope, button);
         badges.put(scope, 0);
         if (notify) {
@@ -89,7 +89,7 @@ public class NotifierService implements INotifierService {
 
     /** {@inheritDoc}
      */
-    public void removeScopeButton(View scope) {
+    public void removeScopeButton(com.vaadin.ui.Component scope) {
         if (scopesButtons.containsKey(scope)) {
             scopesButtons.remove(scope);
             badges.remove(scope);
@@ -98,7 +98,7 @@ public class NotifierService implements INotifierService {
 
     /** {@inheritDoc}
      */
-    public void hideScopeButton(View scope) {
+    public void hideScopeButton(com.vaadin.ui.Component scope) {
         if (scopesButtons.containsKey(scope)) {
             scopesButtons.get(scope).setVisible(false);
         }
@@ -106,7 +106,7 @@ public class NotifierService implements INotifierService {
 
     /** {@inheritDoc}
      */
-    public void removeBadge(View scope) {
+    public void removeBadge(com.vaadin.ui.Component scope) {
         updateBadge(scope, 0);
         scopesButtons.get(scope).setHtmlContentAllowed(true);
         scopesButtons.get(scope).setCaption(getInitialCaption(scopesButtons.get(scope)));
@@ -114,7 +114,7 @@ public class NotifierService implements INotifierService {
 
     /** {@inheritDoc}
      */
-    public void incrementBadge(View scope) {
+    public void incrementBadge(com.vaadin.ui.Component scope) {
         if (scopesButtons.containsKey(scope)) {
             updateBadge(scope, +1);
             scopesButtons.get(scope).setVisible(true);
@@ -127,7 +127,7 @@ public class NotifierService implements INotifierService {
 
     /** {@inheritDoc}
      */
-    public void decrementBadge(View scope) {
+    public void decrementBadge(com.vaadin.ui.Component scope) {
         if (scopesButtons.containsKey(scope)) {
             updateBadge(scope, -1);
             scopesButtons.get(scope).setHtmlContentAllowed(true);
@@ -153,7 +153,7 @@ public class NotifierService implements INotifierService {
      * @param scope
      * @param op
      */
-    private void updateBadge(View scope, int op) {
+    private void updateBadge(com.vaadin.ui.Component scope, int op) {
         if (badges.containsKey(scope)) {
             Integer badge = badges.get(scope);
             if (op == 0) {

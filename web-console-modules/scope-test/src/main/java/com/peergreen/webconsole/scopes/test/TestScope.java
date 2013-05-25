@@ -39,7 +39,7 @@ public class TestScope implements IScopeFactory {
     }
 
     @Override
-    public View getView() {
+    public com.vaadin.ui.Component getView() {
         return scopeTabsFactory.createInstance(SCOPE_NAME);
     }
 

@@ -1,6 +1,6 @@
 package com.peergreen.webconsole.core.api;
 
-import com.vaadin.navigator.View;
+import com.vaadin.ui.Component;
 
 /**
  * Tabs scope factory
@@ -13,7 +13,7 @@ public interface IScopeTabsFactory {
      * @param scopeName
      * @return
      */
-    View createInstance(String scopeName);
+    Component createInstance(String scopeName);
 
     /**
      * Create an instance of tabs view for default scope
@@ -21,6 +21,6 @@ public interface IScopeTabsFactory {
      * @param isDefaultScope
      * @return
      */
-    View createInstance(String scopeName, boolean isDefaultScope);
+    Component createInstance(String scopeName, boolean isDefaultScope);
 
 }

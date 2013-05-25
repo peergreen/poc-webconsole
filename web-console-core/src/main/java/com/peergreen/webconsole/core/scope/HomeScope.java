@@ -43,7 +43,7 @@ public class HomeScope implements IScopeFactory {
     /** {@inheritDoc}
      */
     @Override
-    public View getView() {
+    public com.vaadin.ui.Component getView() {
         return new HomeScopeView(rssService);
     }
 

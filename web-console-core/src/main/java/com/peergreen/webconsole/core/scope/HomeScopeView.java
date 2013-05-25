@@ -30,7 +30,7 @@ import java.net.URL;
 /**
  * Home scope view
  */
-public class HomeScopeView extends VerticalLayout implements View {
+public class HomeScopeView extends VerticalLayout {
 
     /**
      * Peergreen rss flow url
@@ -70,10 +70,6 @@ public class HomeScopeView extends VerticalLayout implements View {
         CssLayout panel = createPanel(notes);
         panel.addStyleName("notes");
         row.addComponent(panel);
-    }
-
-    @Override
-    public void enter(ViewChangeListener.ViewChangeEvent event) {
     }
 
     /**

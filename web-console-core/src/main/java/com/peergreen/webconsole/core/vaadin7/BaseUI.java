@@ -32,7 +32,6 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import org.apache.felix.ipojo.annotations.Bind;
-import org.apache.felix.ipojo.annotations.Invalidate;
 import org.apache.felix.ipojo.annotations.Provides;
 import org.apache.felix.ipojo.annotations.Requires;
 import org.apache.felix.ipojo.annotations.Unbind;
@@ -86,7 +85,7 @@ public class BaseUI extends UI {
     /**
      * Scopes views
      */
-    private ConcurrentHashMap<String, View> scopesViews = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, com.vaadin.ui.Component> scopesViews = new ConcurrentHashMap<>();
 
     /**
      * Buttons related name
@@ -457,10 +456,13 @@ public class BaseUI extends UI {
         if (nav != null) {
             try {
                 nav.removeView("/" + scope.getName());
-                nav.addView("/" + scope.getName(), scopesViews.get(scope.getName()));
-                if (DefaultScope.SCOPE_NAME.equals(scope.getName())) {
-                    nav.addView("", scopesViews.get(scope.getName()));
-                    nav.addView("/", scopesViews.get(scope.getName()));
+                View view = new ScopeNavView(scopesViews.get(scope.getName()));
+                nav.addView("/" + scope.getName(), view);
+                // If is home scope
+                // attach the view to empty and "/" routes
+                if (HomeScope.SCOPE_NAME.equals(scope.getName())) {
+                    nav.addView("", view);
+                    nav.addView("/", view);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
