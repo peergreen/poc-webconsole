@@ -169,7 +169,12 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
      */
     private void addModule(IModuleFactory moduleFactory) {
         if (!components.containsKey(moduleFactory)) {
-            Component view = moduleFactory.getView();
+            Component view;
+            try {
+                view = moduleFactory.getView();
+            } catch (Exception ex) {
+                view = new ExceptionView(ex);
+            }
             view.setSizeFull();
             //tabs.getUI().getSession().getLockInstance().lock();
             try {

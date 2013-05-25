@@ -2,9 +2,10 @@ package com.peergreen.webconsole.core.vaadin7;
 
 import com.peergreen.webconsole.core.api.INotifierService;
 import com.peergreen.webconsole.core.api.IScopeFactory;
+import com.peergreen.webconsole.core.exception.ExceptionView;
 import com.peergreen.webconsole.core.notifier.NotificationOverlay;
-import com.peergreen.webconsole.core.scope.DefaultScope;
 import com.peergreen.webconsole.core.scope.HomeScope;
+import com.peergreen.webconsole.core.scope.ScopeNavView;
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Theme;
 import com.vaadin.event.ShortcutAction;
@@ -123,7 +124,11 @@ public class BaseUI extends UI {
     @Bind(aggregate = true, optional = true)
     public void bindScope(IScopeFactory scope) {
         scopes.put(scope.getName(), scope);
-        scopesViews.put(scope.getName(), scope.getView());
+        try {
+            scopesViews.put(scope.getName(), scope.getView());
+        } catch (Exception e) {
+            scopesViews.put(scope.getName(), new ExceptionView(e));
+        }
         addRouteToNav(scope);
         addScopeButtonInMenu(scope, true);
     }
