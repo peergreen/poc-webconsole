@@ -165,7 +165,7 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
     @Invalidate
     public void stop() {
         // is this views not for a default scope
-        if (!DefaultScope.SCOPE_NAME.equals(scopeName)) {
+        if (!isDefaultScope) {
             // This scope is unbound, add its modules to scopeless modules collector
             for (Map.Entry<IModuleFactory, Component> component : components.entrySet()) {
                 scopelessModuleCollector.addModule(component.getKey());
@@ -203,12 +203,7 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
                 view = new ExceptionView(ex);
             }
             view.setSizeFull();
-            //tabs.getUI().getSession().getLockInstance().lock();
-            try {
-                tabs.addComponent(view);
-            } finally {
-              //  tabs.getUI().getSession().getLockInstance().unlock();
-            }
+            tabs.addComponent(view);
             tabs.getTab(view).setClosable(true);
             tabs.getTab(view).setCaption(moduleFactory.getName());
             components.put(moduleFactory, view);
@@ -220,12 +215,7 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
      * @param moduleFactory
      */
     private void removeModule(IModuleFactory moduleFactory) {
-        //tabs.getUI().getSession().getLockInstance().lock();
-        try {
-            tabs.removeComponent(components.get(moduleFactory));
-        } finally {
-          //  tabs.getUI().getSession().getLockInstance().unlock();
-        }
+        tabs.removeComponent(components.get(moduleFactory));
         components.remove(moduleFactory);
     }
 

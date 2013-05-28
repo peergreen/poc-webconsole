@@ -64,7 +64,7 @@ public class BaseUI extends UI {
     CssLayout root = new CssLayout();
 
     /**
-     * Login lyout
+     * Login layout
      */
     VerticalLayout loginLayout;
 
@@ -208,17 +208,17 @@ public class BaseUI extends UI {
         HorizontalLayout labels = new HorizontalLayout();
         labels.setWidth("100%");
         labels.setMargin(true);
-        labels.addStyleName("labels");
+        //labels.addStyleName("labels");
         loginPanel.addComponent(labels);
 
         Label welcome = new Label("Welcome");
-        welcome.setSizeUndefined();
+        //welcome.setSizeUndefined();
         welcome.addStyleName("h4");
         labels.addComponent(welcome);
         labels.setComponentAlignment(welcome, Alignment.MIDDLE_LEFT);
 
         Label title = new Label(consoleName);
-        title.setSizeUndefined();
+        //title.setSizeUndefined();
         title.addStyleName("h2");
         title.addStyleName("light");
         labels.addComponent(title);
@@ -405,8 +405,13 @@ public class BaseUI extends UI {
             nav.navigateTo("/home");
             viewNameToMenuButton.get("/home").addStyleName("selected");
         } else {
-            nav.navigateTo(f);
-            viewNameToMenuButton.get(f).addStyleName("selected");
+            try {
+                nav.navigateTo(f);
+                viewNameToMenuButton.get(f).addStyleName("selected");
+            } catch (Exception e) {
+                nav.addView(f, new ScopeNavView(new ExceptionView(e)));
+                nav.navigateTo(f);
+            }
         }
 
         nav.addViewChangeListener(new ViewChangeListener() {
