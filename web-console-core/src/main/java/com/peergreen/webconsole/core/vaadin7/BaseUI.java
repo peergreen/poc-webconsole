@@ -389,7 +389,9 @@ public class BaseUI extends UI {
 
         // Add Menu buttons
         for(final Map.Entry<String, IScopeFactory> scope : scopes.entrySet()) {
-            addScopeButtonInMenu(scope.getValue(), false);
+            if (showScope(scope.getValue())) {
+                addScopeButtonInMenu(scope.getValue(), false);
+            }
         }
 
         menu.addStyleName("menu");
@@ -461,7 +463,9 @@ public class BaseUI extends UI {
         nav = new Navigator(this, content);
         // Build routes
         for (Map.Entry<String, IScopeFactory> scope : scopes.entrySet()) {
-            addRouteToNav(scope.getValue());
+            if (showScope(scope.getValue())) {
+                addRouteToNav(scope.getValue());
+            }
         }
     }
 
@@ -544,15 +548,14 @@ public class BaseUI extends UI {
      * @param scope
      */
     private void removeScopeButtonInMenu(IScopeFactory scope) {
-        if (viewNameToMenuButton.containsKey("/" + scope.getName())) {
-            //menu.getUI().getSession().getLockInstance().lock();
-            try {
-                menu.removeComponent(viewNameToMenuButton.get("/" + scope.getName()));
-            } finally {
-                //menu.getUI().getSession().getLockInstance().unlock();
-            }
-            viewNameToMenuButton.remove("/" + scope.getName());
-            notifierService.removeScopeButton(scopesViews.get(scope.getName()));
+        if (viewNameToMenuButton.containsKey("/" + scope.getSymbolicName())) {
+            menu.removeComponent(viewNameToMenuButton.get("/" + scope.getSymbolicName()));
+            viewNameToMenuButton.remove("/" + scope.getSymbolicName());
+            notifierService.removeScopeButton(scopesViews.get(scope.getSymbolicName()));
         }
+    }
+
+    private boolean showScope(IScopeFactory scopeFactory) {
+        return securityManager.isUserInRoles(scopeFactory.getAllowedRoles());
     }
 }

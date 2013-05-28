@@ -117,8 +117,7 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
      */
     @Bind(aggregate = true, optional = true)
     public void bindModule(IModuleFactory moduleFactory) {
-        if (scopeName.equals(moduleFactory.getScope()) ||
-                (isDefaultScope && !scopes.contains(moduleFactory.getScope()))) {
+        if (canAddModule(moduleFactory)) {
             addModule(moduleFactory);
             scopelessModuleCollector.removeModule(moduleFactory);
             notifierService.incrementBadge(this);
@@ -173,6 +172,21 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
             }
             // Notify default scopes that there is scopeless modules
             scopelessModuleCollector.notifyDefaultScopes();
+        }
+    }
+
+    private boolean canAddModule(IModuleFactory moduleFactory) {
+        if (!securityManager.isUserInRoles(moduleFactory.getAllowedRoles())) {
+            return false;
+        }
+        if (isDefaultScope && !scopes.contains(moduleFactory.getScope())) {
+            return true;
+        } else {
+            if (scopesRange.isEmpty()) {
+                return scopeName.equals(moduleFactory.getScope());
+            } else {
+                return scopesRange.contains(moduleFactory.getScope());
+            }
         }
     }
 
