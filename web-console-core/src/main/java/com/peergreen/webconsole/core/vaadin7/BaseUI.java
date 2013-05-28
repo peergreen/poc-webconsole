@@ -4,6 +4,8 @@ import com.peergreen.security.UsernamePasswordAuthenticateService;
 import com.peergreen.webconsole.core.api.INotifierService;
 import com.peergreen.webconsole.core.api.IScopeFactory;
 import com.peergreen.webconsole.core.api.ISecurityManager;
+import com.peergreen.webconsole.core.api.IViewIPojoInstanceGarbageCollector;
+import com.peergreen.webconsole.core.context.BaseUIContext;
 import com.peergreen.webconsole.core.exception.ExceptionView;
 import com.peergreen.webconsole.core.notifier.NotificationOverlay;
 import com.peergreen.webconsole.core.scope.HomeScope;
@@ -19,7 +21,6 @@ import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.Page;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -122,14 +123,15 @@ public class BaseUI extends UI {
     @Requires
     private UsernamePasswordAuthenticateService authenticateService;
 
+    @Requires
+    private IViewIPojoInstanceGarbageCollector viewIPojoInstanceGarbageCollector;
+
     /**
      * Base console UI constructor
      * @param consoleName
      */
     public BaseUI(String consoleName) {
         this.consoleName = consoleName;
-        this.securityManager = new SecurityManager();
-        VaadinSession.getCurrent().setAttribute("security.manager", securityManager);
     }
 
     /**
@@ -368,6 +370,9 @@ public class BaseUI extends UI {
                                     @Override
                                     public void buttonClick(Button.ClickEvent event) {
                                         ((SecurityManager) securityManager).setUserLogged(false);
+                                        for (Map.Entry<String, Component> scopeView : scopesViews.entrySet()) {
+                                            viewIPojoInstanceGarbageCollector.removeView(scopeView.getValue());
+                                        }
                                         buildLoginView(true);
                                     }
                                 });

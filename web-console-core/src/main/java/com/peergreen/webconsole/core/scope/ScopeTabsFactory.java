@@ -108,6 +108,7 @@ public class ScopeTabsFactory implements IScopeTabsFactory {
             if (refs != null) {
                 scope = (ScopeTabsView) bundleContext.getService(refs[0]);
             }
+            viewIPojoInstanceGarbageCollector.addView(scope, instance);
         } catch (UnacceptableConfiguration unacceptableConfiguration) {
             unacceptableConfiguration.printStackTrace();
         } catch (MissingHandlerException ex) {
