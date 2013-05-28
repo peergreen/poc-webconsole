@@ -8,6 +8,9 @@ import org.apache.felix.ipojo.annotations.Instantiate;
 import org.apache.felix.ipojo.annotations.Provides;
 import org.apache.felix.ipojo.annotations.Requires;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Home scope factory
  * @author Mohammed Boukada
@@ -27,6 +30,10 @@ public class HomeScope implements IScopeFactory {
      */
     final static String STYLE = "icon-dashboard";
 
+    private List<String> allowedRoles = new ArrayList<String>() {{
+        add("all");
+    }};
+
     /**
      * Rss Service
      */
@@ -36,8 +43,13 @@ public class HomeScope implements IScopeFactory {
     /** {@inheritDoc}
      */
     @Override
-    public String getName() {
+    public String getSymbolicName() {
         return SCOPE_NAME;
+    }
+
+    @Override
+    public List<String> getAllowedRoles() {
+        return allowedRoles;
     }
 
     /** {@inheritDoc}

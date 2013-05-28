@@ -17,6 +17,9 @@ import com.vaadin.ui.NativeButton;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * User: mohammed
@@ -31,7 +34,9 @@ public class BundlesModule implements IModuleFactory {
 
     private final BundleContext bundleContext;
     private Table table;
-    private ProgressIndicator sample;
+    private List<String> allowedRoles = new ArrayList<String>() {{
+        add("platform-admin");
+    }};
 
     public BundlesModule(final BundleContext bundleContext) {
         this.bundleContext = bundleContext;
@@ -57,19 +62,6 @@ public class BundlesModule implements IModuleFactory {
         refreshTable();
         verticalLayout.addComponent(table);
 
-//        HorizontalLayout horizontalLayout = new HorizontalLayout();
-//        horizontalLayout.setSpacing(true);
-//
-//        Button refreshButton = new NativeButton("Refresh Table");
-//        refreshButton.addClickListener(new Button.ClickListener() {
-//            @Override
-//            public void buttonClick(Button.ClickEvent event) {
-//                refreshTable();
-//            }
-//        });
-//        horizontalLayout.addComponent(refreshButton);
-//
-//        verticalLayout.addComponent(horizontalLayout);
         return verticalLayout;
     }
 
@@ -84,7 +76,6 @@ public class BundlesModule implements IModuleFactory {
             checkBox.setImmediate(true);
             checkBox.setValue(bundle.getState() == Bundle.ACTIVE);
             checkBox.addValueChangeListener(new ValueChangeListener() {
-                private static final long serialVersionUID = 1L;
 
                 @Override
                 public void valueChange(
@@ -105,18 +96,6 @@ public class BundlesModule implements IModuleFactory {
                             e1.printStackTrace();
                         }
                     }
-//                    sample.setEnabled(true);
-//                    sample.setVisible(true);
-//                    ((CheckBox) event.getProperty()).setEnabled(false);
-//                    try {
-//                        Thread.sleep(2000);
-//                    } catch (final InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                    sample.setEnabled(false);
-//                    sample.setVisible(false);
-//                    ((CheckBox) event.getProperty()).setEnabled(true);
-
                 }
             });
             table.addItem(
@@ -154,5 +133,10 @@ public class BundlesModule implements IModuleFactory {
     @Override
     public String getName() {
         return "Bundles";
+    }
+
+    @Override
+    public List<String> getAllowedRoles() {
+        return allowedRoles;
     }
 }

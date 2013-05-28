@@ -7,6 +7,9 @@ import org.apache.felix.ipojo.annotations.Instantiate;
 import org.apache.felix.ipojo.annotations.Provides;
 import org.apache.felix.ipojo.annotations.Requires;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Default scope factory
  * @author Mohammed Boukada
@@ -20,6 +23,14 @@ public class DefaultScope implements IScopeFactory {
      * Default scope name
      */
     public final static String SCOPE_NAME = "others";
+
+    private List<String> scopesRange = new ArrayList<String>() {{
+        add(SCOPE_NAME);
+    }};
+
+    private List<String> allowedRoles = new ArrayList<String>() {{
+        add("all");
+    }};
 
     /**
      * Default scope button style
@@ -35,15 +46,22 @@ public class DefaultScope implements IScopeFactory {
     /** {@inheritDoc}
      */
     @Override
-    public String getName() {
+    public String getSymbolicName() {
         return SCOPE_NAME;
     }
 
     /** {@inheritDoc}
      */
     @Override
+    public List<String> getAllowedRoles() {
+        return allowedRoles;
+    }
+
+    /** {@inheritDoc}
+     */
+    @Override
     public com.vaadin.ui.Component getView() {
-        return scopeTabsFactory.createInstance(SCOPE_NAME, true);
+        return scopeTabsFactory.createInstance(SCOPE_NAME, allowedRoles, true);
     }
 
     /** {@inheritDoc}

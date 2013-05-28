@@ -12,10 +12,16 @@ import java.util.List;
 public interface IScopeFactory {
 
     /**
-     * Get scope name
+     * Get symbolic scope name
      * @return scope name
      */
-    String getName();
+    String getSymbolicName();
+
+    /**
+     * Get allowed roles
+     * @return allowed roles
+     */
+    List<String> getAllowedRoles();
 
     /**
      * Get scope view

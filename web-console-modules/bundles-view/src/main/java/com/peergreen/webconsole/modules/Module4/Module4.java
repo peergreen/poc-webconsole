@@ -6,6 +6,9 @@ import com.vaadin.ui.Label;
 import org.apache.felix.ipojo.annotations.Instantiate;
 import org.apache.felix.ipojo.annotations.Provides;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * User: mohammed
@@ -17,6 +20,11 @@ import org.apache.felix.ipojo.annotations.Provides;
 @Provides
 @Instantiate
 public class Module4 implements IModuleFactory {
+
+    private List<String> allowedRoles = new ArrayList<String>() {{
+        add("all");
+    }};
+
     @Override
     public com.vaadin.ui.Component getView() {
         CssLayout component = new CssLayout();
@@ -36,5 +44,10 @@ public class Module4 implements IModuleFactory {
     @Override
     public String getName() {
         return "Shell Manager";
+    }
+
+    @Override
+    public List<String> getAllowedRoles() {
+        return allowedRoles;
     }
 }

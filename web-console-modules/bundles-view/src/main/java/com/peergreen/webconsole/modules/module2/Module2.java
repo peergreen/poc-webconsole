@@ -11,6 +11,9 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * User: mohammed
@@ -24,6 +27,9 @@ import com.vaadin.ui.Label;
 public class Module2 implements IModuleFactory {
 
     private final BundleContext bundleContext;
+    private List<String> allowedRoles = new ArrayList<String>() {{
+        add("all");
+    }};
 
     public Module2(BundleContext bundleContext) {
         this.bundleContext = bundleContext;
@@ -49,5 +55,10 @@ public class Module2 implements IModuleFactory {
     @Override
     public String getName() {
         return "Security Manager";
+    }
+
+    @Override
+    public List<String> getAllowedRoles() {
+        return allowedRoles;
     }
 }

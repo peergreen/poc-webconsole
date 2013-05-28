@@ -8,6 +8,9 @@ import com.vaadin.ui.VerticalLayout;
 import org.apache.felix.ipojo.annotations.Instantiate;
 import org.apache.felix.ipojo.annotations.Provides;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * User: mohammed
@@ -19,6 +22,11 @@ import org.apache.felix.ipojo.annotations.Provides;
 @Provides
 @Instantiate
 public class PeergreenDocumentation implements IModuleFactory {
+
+    private List<String> allowedRoles = new ArrayList<String>() {{
+        add("all");
+    }};
+
     @Override
     public Component getView() {
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -40,5 +48,10 @@ public class PeergreenDocumentation implements IModuleFactory {
     @Override
     public String getName() {
         return "Peergreen Documentation";
+    }
+
+    @Override
+    public List<String> getAllowedRoles() {
+        return allowedRoles;
     }
 }

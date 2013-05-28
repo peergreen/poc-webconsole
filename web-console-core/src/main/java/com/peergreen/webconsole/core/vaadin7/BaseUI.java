@@ -138,12 +138,7 @@ public class BaseUI extends UI {
      */
     @Bind(aggregate = true, optional = true)
     public void bindScope(IScopeFactory scope) {
-        scopes.put(scope.getName(), scope);
-        try {
-            scopesViews.put(scope.getName(), scope.getView());
-        } catch (Exception e) {
-            scopesViews.put(scope.getName(), new ExceptionView(e));
-        }
+        scopes.put(scope.getSymbolicName(), scope);
         addRouteToNav(scope);
         addScopeButtonInMenu(scope, true);
     }
@@ -154,10 +149,12 @@ public class BaseUI extends UI {
      */
     @Unbind
     public void unbindScope(IScopeFactory scope) {
-        removeRouteFromNav(scope);
-        removeScopeButtonInMenu(scope);
-        scopes.remove(scope.getName());
-        scopesViews.remove(scope.getName());
+        if (scopes.containsKey(scope.getSymbolicName())) {
+            removeRouteFromNav(scope);
+            removeScopeButtonInMenu(scope);
+            scopes.remove(scope.getSymbolicName());
+            scopesViews.remove(scope.getSymbolicName());
+        }
     }
 
     /**
@@ -475,12 +472,17 @@ public class BaseUI extends UI {
     private void addRouteToNav(IScopeFactory scope) {
         if (nav != null) {
             try {
-                nav.removeView("/" + scope.getName());
-                View view = new ScopeNavView(scopesViews.get(scope.getName()));
-                nav.addView("/" + scope.getName(), view);
+                nav.removeView("/" + scope.getSymbolicName());
+                try {
+                    scopesViews.put(scope.getSymbolicName(), scope.getView());
+                } catch (Exception e) {
+                    scopesViews.put(scope.getSymbolicName(), new ExceptionView(e));
+                }
+                View view = new ScopeNavView(scopesViews.get(scope.getSymbolicName()));
+                nav.addView("/" + scope.getSymbolicName(), view);
                 // If is home scope
                 // attach the view to empty and "/" routes
-                if (HomeScope.SCOPE_NAME.equals(scope.getName())) {
+                if (HomeScope.SCOPE_NAME.equals(scope.getSymbolicName())) {
                     nav.addView("", view);
                     nav.addView("/", view);
                 }
@@ -496,7 +498,7 @@ public class BaseUI extends UI {
      */
     private void removeRouteFromNav(IScopeFactory scope) {
         if (nav != null) {
-            nav.removeView("/" + scope.getName());
+            nav.removeView("/" + scope.getSymbolicName());
         }
     }
 
@@ -511,7 +513,7 @@ public class BaseUI extends UI {
             return;
         }
 
-        final Button b = new NativeButton(scope.getName().toUpperCase());
+        final Button b = new NativeButton(scope.getSymbolicName().toUpperCase());
 
         b.addStyleName(scope.getStyle());
 
@@ -519,10 +521,10 @@ public class BaseUI extends UI {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 clearMenuSelection();
-                notifierService.removeBadge(scopesViews.get(scope.getName()));
+                notifierService.removeBadge(scopesViews.get(scope.getSymbolicName()));
                 event.getButton().addStyleName("selected");
-                if (!nav.getState().equals("/" + scope.getName()))
-                    nav.navigateTo("/" + scope.getName());
+                if (!nav.getState().equals("/" + scope.getSymbolicName()))
+                    nav.navigateTo("/" + scope.getSymbolicName());
             }
         });
         menu.getUI().getSession().getLockInstance().lock();
@@ -532,9 +534,9 @@ public class BaseUI extends UI {
             menu.getUI().getSession().getLockInstance().unlock();
         }
 
-        notifierService.addScopeButton(scopesViews.get(scope.getName()), b, notify);
+        notifierService.addScopeButton(scopesViews.get(scope.getSymbolicName()), b, notify);
 
-        viewNameToMenuButton.put("/" + scope.getName(), b);
+        viewNameToMenuButton.put("/" + scope.getSymbolicName(), b);
     }
 
     /**

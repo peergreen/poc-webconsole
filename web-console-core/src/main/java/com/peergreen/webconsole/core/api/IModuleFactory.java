@@ -2,6 +2,8 @@ package com.peergreen.webconsole.core.api;
 
 import com.vaadin.ui.Component;
 
+import java.util.List;
+
 /**
  * Vaadin module factory
  * @author Mohammed Boukada
@@ -25,4 +27,10 @@ public interface IModuleFactory {
      * @return module name
      */
     public String getName();
+
+    /**
+     * Get allowed roles
+     * @return allowed roles
+     */
+    List<String> getAllowedRoles();
 }

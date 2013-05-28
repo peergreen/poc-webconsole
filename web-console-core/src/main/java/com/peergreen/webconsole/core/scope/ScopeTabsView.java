@@ -53,6 +53,11 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
     private String scopeName;
 
     /**
+     * List of scopes name range
+     */
+    private List<String> scopesRange;
+
+    /**
      * Notifier service
      */
     @Requires
@@ -142,12 +147,12 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
      */
     @Bind(aggregate = true, optional = true)
     public void bindScope(IScopeFactory scopeFactory) {
-        // is this view is for a default scope
-        if (isDefaultScope && !scopeName.equals(scopeFactory.getName())) {
-            scopes.add(scopeFactory.getName());
+        // is this a default scope
+        if (isDefaultScope && !scopes.equals(scopeFactory.getSymbolicName())) {
+            scopes.add(scopeFactory.getSymbolicName());
             // A scope was bound, check if its modules are under the default scope
             for (Map.Entry<IModuleFactory, Component> component : components.entrySet()) {
-                if (scopeFactory.getName().equals(component.getKey().getScope())) {
+                if (scopeFactory.getSymbolicName().equals(component.getKey().getScope())) {
                     // Remove the module because its scope was bound
                     removeModule(component.getKey());
                 }

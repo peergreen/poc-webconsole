@@ -14,6 +14,9 @@ import org.apache.felix.ipojo.annotations.Requires;
 import org.apache.felix.ipojo.annotations.Unbind;
 import org.apache.felix.ipojo.annotations.Validate;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * User: mohammed
@@ -30,12 +33,21 @@ public class TestScope implements IScopeFactory {
 
     final static String STYLE = "icon-sales";
 
+    private List<String> allowedRoles = new ArrayList<String>() {{
+        add("platform-admin");
+    }};
+
     @Requires
     IScopeTabsFactory scopeTabsFactory;
 
     @Override
-    public String getName() {
+    public String getSymbolicName() {
         return SCOPE_NAME;
+    }
+
+    @Override
+    public List<String> getAllowedRoles() {
+        return allowedRoles;
     }
 
     @Override

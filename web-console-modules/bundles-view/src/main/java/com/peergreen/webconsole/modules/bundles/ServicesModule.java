@@ -35,6 +35,9 @@ public class ServicesModule implements IModuleFactory {
 
     private final BundleContext bundleContext;
     private Table table;
+    private List<String> allowedRoles = new ArrayList<String>() {{
+        add("test");
+    }};
 
     public ServicesModule(final BundleContext bundleContext) {
         this.bundleContext = bundleContext;
@@ -102,6 +105,11 @@ public class ServicesModule implements IModuleFactory {
     @Override
     public String getName() {
         return "Services";
+    }
+
+    @Override
+    public List<String> getAllowedRoles() {
+        return allowedRoles;
     }
 
 }
