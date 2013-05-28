@@ -5,9 +5,9 @@ import com.peergreen.webconsole.core.api.IModuleFactory;
 import com.peergreen.webconsole.core.api.INotifierService;
 import com.peergreen.webconsole.core.api.IScopeFactory;
 import com.peergreen.webconsole.core.api.IScopelessModuleCollector;
+import com.peergreen.webconsole.core.api.ISecurityManager;
 import com.peergreen.webconsole.core.exception.ExceptionView;
-import com.vaadin.navigator.View;
-import com.vaadin.navigator.ViewChangeListener;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.TabSheet;
@@ -65,6 +65,11 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
     private IScopelessModuleCollector scopelessModuleCollector;
 
     /**
+     * Security Manager
+     */
+    private ISecurityManager securityManager;
+
+    /**
      * Whether this view scope is for default scope
      */
     private boolean isDefaultScope;
@@ -72,12 +77,15 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
     /**
      * Init tabs scope view
      * @param scopeName
+     * @param scopesRange
      * @param isDefaultScope
      */
-    public ScopeTabsView(String scopeName, boolean isDefaultScope) {
+    public ScopeTabsView(String scopeName, List<String> scopesRange, boolean isDefaultScope) {
 
         this.scopeName = scopeName;
+        this.scopesRange = scopesRange;
         this.isDefaultScope = isDefaultScope;
+        this.securityManager = (ISecurityManager) VaadinSession.getCurrent().getAttribute("security.manager");
 
         setSizeFull();
 

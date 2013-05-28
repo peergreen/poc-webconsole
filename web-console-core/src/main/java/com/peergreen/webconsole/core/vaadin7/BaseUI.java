@@ -1,11 +1,14 @@
 package com.peergreen.webconsole.core.vaadin7;
 
+import com.peergreen.security.UsernamePasswordAuthenticateService;
 import com.peergreen.webconsole.core.api.INotifierService;
 import com.peergreen.webconsole.core.api.IScopeFactory;
+import com.peergreen.webconsole.core.api.ISecurityManager;
 import com.peergreen.webconsole.core.exception.ExceptionView;
 import com.peergreen.webconsole.core.notifier.NotificationOverlay;
 import com.peergreen.webconsole.core.scope.HomeScope;
 import com.peergreen.webconsole.core.scope.ScopeNavView;
+import com.peergreen.webconsole.core.security.SecurityManager;
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Theme;
 import com.vaadin.event.ShortcutAction;
@@ -16,6 +19,7 @@ import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.Page;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -37,6 +41,7 @@ import org.apache.felix.ipojo.annotations.Provides;
 import org.apache.felix.ipojo.annotations.Requires;
 import org.apache.felix.ipojo.annotations.Unbind;
 
+import javax.security.auth.Subject;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
@@ -104,10 +109,18 @@ public class BaseUI extends UI {
     private boolean uiIsBuilt = false;
 
     /**
+     * Security manager
+     */
+    private ISecurityManager securityManager;
+
+    /**
      * Notifier service
      */
     @Requires
-    INotifierService notifierService;
+    private INotifierService notifierService;
+
+    @Requires
+    private UsernamePasswordAuthenticateService authenticateService;
 
     /**
      * Base console UI constructor
@@ -115,6 +128,8 @@ public class BaseUI extends UI {
      */
     public BaseUI(String consoleName) {
         this.consoleName = consoleName;
+        this.securityManager = new SecurityManager();
+        VaadinSession.getCurrent().setAttribute("security.manager", securityManager);
     }
 
     /**
@@ -240,30 +255,28 @@ public class BaseUI extends UI {
         signin.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                buildMainView();
-//                if (username.getValue() != null
-//                        && username.getValue().equals("")
-//                        && password.getValue() != null
-//                        && password.getValue().equals("")) {
-//                    signin.removeShortcutListener(enter);
-//                    buildMainView();
-//                } else {
-//                    if (loginPanel.getComponentCount() > 2) {
-//                        // Remove the previous error message
-//                        loginPanel.removeComponent(loginPanel.getComponent(2));
-//                    }
-//                    // Add new error message
-//                    Label error = new Label(
-//                            "Wrong username or password. <span>Hint: try empty values</span>",
-//                            ContentMode.HTML);
-//                    error.addStyleName("error");
-//                    error.setSizeUndefined();
-//                    error.addStyleName("light");
-//                    // Add animation
-//                    error.addStyleName("v-animate-reveal");
-//                    loginPanel.addComponent(error);
-//                    username.focus();
-//                }
+                Subject subject = authenticateService.authenticate(username.getValue(), password.getValue());
+                if (subject != null) {
+                    ((SecurityManager) securityManager).setSubject(subject);
+                    buildMainView();
+                }
+                else {
+                    if (loginPanel.getComponentCount() > 2) {
+                        // Remove the previous error message
+                        loginPanel.removeComponent(loginPanel.getComponent(2));
+                    }
+                    // Add new error message
+                    Label error = new Label(
+                            "Wrong username or password.",
+                            ContentMode.HTML);
+                    error.addStyleName("error");
+                    error.setSizeUndefined();
+                    error.addStyleName("light");
+                    // Add animation
+                    error.addStyleName("v-animate-reveal");
+                    loginPanel.addComponent(error);
+                    username.focus();
+                }
             }
         });
 
@@ -279,6 +292,9 @@ public class BaseUI extends UI {
      * Build main view
      */
     private void buildMainView() {
+        if (!securityManager.isUserLogged()) {
+            buildLoginView(true);
+        }
 
         uiIsBuilt = true;
         buildRoutes();
@@ -325,9 +341,7 @@ public class BaseUI extends UI {
                                         new ThemeResource("img/profile-pic.png"));
                                 profilePic.setWidth("34px");
                                 addComponent(profilePic);
-                                Label userName = new Label("Mohammed"
-                                        + " "
-                                        + "Boukada");
+                                Label userName = new Label(securityManager.getUserName());
                                 userName.setSizeUndefined();
                                 addComponent(userName);
 
@@ -356,6 +370,7 @@ public class BaseUI extends UI {
                                 exit.addClickListener(new Button.ClickListener() {
                                     @Override
                                     public void buttonClick(Button.ClickEvent event) {
+                                        ((SecurityManager) securityManager).setUserLogged(false);
                                         buildLoginView(true);
                                     }
                                 });
