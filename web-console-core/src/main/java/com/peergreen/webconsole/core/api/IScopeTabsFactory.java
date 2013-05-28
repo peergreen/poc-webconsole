@@ -15,7 +15,7 @@ public interface IScopeTabsFactory {
      * @param scopeName
      * @return
      */
-    Component createInstance(String scopeName);
+    Component createInstance(String scopeName, UIContext context);
 
     /**
      * Create an instance of tabs view
@@ -23,7 +23,7 @@ public interface IScopeTabsFactory {
      * @param scopesRange
      * @return
      */
-    Component createInstance(String scopeName, List<String> scopesRange);
+    Component createInstance(String scopeName, List<String> scopesRange, UIContext context);
 
     /**
      * Create an instance of tabs view
@@ -31,7 +31,7 @@ public interface IScopeTabsFactory {
      * @param isDefaultScope
      * @return
      */
-    Component createInstance(String scopeName, boolean isDefaultScope);
+    Component createInstance(String scopeName, boolean isDefaultScope, UIContext context);
 
     /**
      * Create an instance of tabs view for default scope
@@ -40,6 +40,6 @@ public interface IScopeTabsFactory {
      * @param isDefaultScope
      * @return
      */
-    Component createInstance(String scopeName, List<String> scopesRange, boolean isDefaultScope);
+    Component createInstance(String scopeName, List<String> scopesRange, boolean isDefaultScope, UIContext context);
 
 }

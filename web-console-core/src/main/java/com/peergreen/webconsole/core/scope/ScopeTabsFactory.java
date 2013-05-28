@@ -3,6 +3,8 @@ package com.peergreen.webconsole.core.scope;
 import com.peergreen.webconsole.core.api.INotifierService;
 import com.peergreen.webconsole.core.api.IScopeFactory;
 import com.peergreen.webconsole.core.api.IScopeTabsFactory;
+import com.peergreen.webconsole.core.api.IViewIPojoInstanceGarbageCollector;
+import com.peergreen.webconsole.core.api.UIContext;
 import org.apache.felix.ipojo.ComponentInstance;
 import org.apache.felix.ipojo.ConfigurationException;
 import org.apache.felix.ipojo.Factory;
@@ -46,6 +48,12 @@ public class ScopeTabsFactory implements IScopeTabsFactory {
     private Factory factory;
 
     /**
+     * IPojo instance of views garbage collector
+     */
+    @Requires
+    private IViewIPojoInstanceGarbageCollector viewIPojoInstanceGarbageCollector;
+
+    /**
      * Bundle context
      */
     private BundleContext bundleContext;
@@ -66,31 +74,31 @@ public class ScopeTabsFactory implements IScopeTabsFactory {
     /** {@inheritDoc}
      */
     @Override
-    public com.vaadin.ui.Component createInstance(String scopeName) {
-        return createInstance(scopeName, new ArrayList<String>(), false);
+    public com.vaadin.ui.Component createInstance(String scopeName, UIContext context) {
+        return createInstance(scopeName, new ArrayList<String>(), false, context);
     }
 
     /** {@inheritDoc}
      */
     @Override
-    public com.vaadin.ui.Component createInstance(String scopeName, List<String> scopesRange) {
-        return createInstance(scopeName, scopesRange, false);
+    public com.vaadin.ui.Component createInstance(String scopeName, List<String> scopesRange, UIContext context) {
+        return createInstance(scopeName, scopesRange, false, context);
     }
 
     /** {@inheritDoc}
      */
     @Override
-    public com.vaadin.ui.Component createInstance(String scopeName, boolean isDefaultScope) {
-        return createInstance(scopeName, new ArrayList<String>(), isDefaultScope);
+    public com.vaadin.ui.Component createInstance(String scopeName, boolean isDefaultScope, UIContext context) {
+        return createInstance(scopeName, new ArrayList<String>(), isDefaultScope, context);
     }
 
     /** {@inheritDoc}
      */
     @Override
-    public com.vaadin.ui.Component createInstance(String scopeName, List<String> scopesRange, boolean isDefaultScope) {
+    public com.vaadin.ui.Component createInstance(String scopeName, List<String> scopesRange, boolean isDefaultScope, UIContext context) {
         ScopeTabsView scope = null;
         try {
-            ScopeTabsView scopeTabsView = new ScopeTabsView(scopeName, scopesRange, isDefaultScope);
+            ScopeTabsView scopeTabsView = new ScopeTabsView(scopeName, scopesRange, isDefaultScope, context);
             Properties props = new Properties();
             props.put("instance.object", scopeTabsView);
             ComponentInstance instance = factory.createComponentInstance(props);

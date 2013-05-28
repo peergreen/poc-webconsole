@@ -6,8 +6,8 @@ import com.peergreen.webconsole.core.api.INotifierService;
 import com.peergreen.webconsole.core.api.IScopeFactory;
 import com.peergreen.webconsole.core.api.IScopelessModuleCollector;
 import com.peergreen.webconsole.core.api.ISecurityManager;
+import com.peergreen.webconsole.core.api.UIContext;
 import com.peergreen.webconsole.core.exception.ExceptionView;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.TabSheet;
@@ -41,11 +41,6 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
         Used for identify a tab
      */
     private ConcurrentHashMap<IModuleFactory, Component> modulesViews = new ConcurrentHashMap<>();
-
-    /**
-     * List of modules in this view
-     */
-    private ConcurrentLinkedQueue<IModuleFactory> modules = new ConcurrentLinkedQueue<>();
 
     /**
      * List of scopes
@@ -90,11 +85,12 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
      * @param scopesRange
      * @param isDefaultScope
      */
-    public ScopeTabsView(String scopeName, List<String> scopesRange, boolean isDefaultScope) {
+    public ScopeTabsView(String scopeName, List<String> scopesRange, boolean isDefaultScope, UIContext context) {
 
         this.scopeName = scopeName;
         this.scopesRange = scopesRange;
         this.isDefaultScope = isDefaultScope;
+        this.securityManager = context.getSecurityManager();
 
         setSizeFull();
 
@@ -113,28 +109,12 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
         });
     }
 
-    @Override
-    public void attach() {
-        super.attach();
-        this.securityManager = (ISecurityManager) VaadinSession.getCurrent().getAttribute("security.manager");
-        addModules();
-    }
-
-    public void addModules() {
-        for (IModuleFactory moduleFactory : modules) {
-            if (!modulesViews.containsKey(moduleFactory) && canAddModule(moduleFactory)) {
-                addModule(moduleFactory);
-            }
-        }
-    }
-
     /**
      * Bind a new module
      * @param moduleFactory
      */
     @Bind(aggregate = true, optional = true)
     public void bindModule(IModuleFactory moduleFactory) {
-        modules.add(moduleFactory);
         if (canAddModule(moduleFactory)) {
             addModule(moduleFactory);
             scopelessModuleCollector.removeModule(moduleFactory);
@@ -148,7 +128,6 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
      */
     @Unbind
     public void unbindModule(IModuleFactory moduleFactory) {
-        modules.remove(moduleFactory);
         if (modulesViews.containsKey(moduleFactory)) {
             removeModule(moduleFactory);
             if (modulesViews.isEmpty()) {
@@ -184,7 +163,7 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
     @Invalidate
     public void stop() {
         // is this views not for a default scope
-        if (!isDefaultScope) {
+        if (!isDefaultScope && securityManager.isUserLogged()) {
             // This scope is unbound, add its modules to scopeless modules collector
             for (Map.Entry<IModuleFactory, Component> component : modulesViews.entrySet()) {
                 scopelessModuleCollector.addModule(component.getKey());
@@ -195,9 +174,6 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
     }
 
     private boolean canAddModule(IModuleFactory moduleFactory) {
-        if (securityManager == null) {
-            return false;
-        }
         if (!securityManager.isUserInRoles(moduleFactory.getAllowedRoles())) {
             return false;
         }

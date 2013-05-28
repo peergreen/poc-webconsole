@@ -25,7 +25,7 @@ public class SecurityManager implements ISecurityManager {
 
     private boolean userLogged = false;
 
-    public void setSubject(Subject subject) {
+    public SecurityManager(Subject subject) {
         Iterator iterator = subject.getPrincipals().iterator();
         while (iterator.hasNext()) {
             Object object = iterator.next();

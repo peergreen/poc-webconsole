@@ -2,6 +2,7 @@ package com.peergreen.webconsole.core.scope;
 
 import com.peergreen.newsfeed.RssService;
 import com.peergreen.webconsole.core.api.IScopeFactory;
+import com.peergreen.webconsole.core.api.UIContext;
 import com.vaadin.navigator.View;
 import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Instantiate;
@@ -55,7 +56,7 @@ public class HomeScope implements IScopeFactory {
     /** {@inheritDoc}
      */
     @Override
-    public com.vaadin.ui.Component getView() {
+    public com.vaadin.ui.Component getView(UIContext context) {
         return new HomeScopeView(rssService);
     }
 

@@ -2,6 +2,7 @@ package com.peergreen.webconsole.core.scope;
 
 import com.peergreen.webconsole.core.api.IScopeFactory;
 import com.peergreen.webconsole.core.api.IScopeTabsFactory;
+import com.peergreen.webconsole.core.api.UIContext;
 import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Instantiate;
 import org.apache.felix.ipojo.annotations.Provides;
@@ -60,8 +61,8 @@ public class DefaultScope implements IScopeFactory {
     /** {@inheritDoc}
      */
     @Override
-    public com.vaadin.ui.Component getView() {
-        return scopeTabsFactory.createInstance(SCOPE_NAME, allowedRoles, true);
+    public com.vaadin.ui.Component getView(UIContext context) {
+        return scopeTabsFactory.createInstance(SCOPE_NAME, allowedRoles, true, context);
     }
 
     /** {@inheritDoc}

@@ -4,6 +4,7 @@ import com.peergreen.webconsole.core.api.IModuleFactory;
 import com.peergreen.webconsole.core.api.INotifierService;
 import com.peergreen.webconsole.core.api.IScopeFactory;
 import com.peergreen.webconsole.core.api.IScopeTabsFactory;
+import com.peergreen.webconsole.core.api.UIContext;
 import com.vaadin.navigator.View;
 import org.apache.felix.ipojo.annotations.Bind;
 import org.apache.felix.ipojo.annotations.Component;
@@ -51,8 +52,8 @@ public class TestScope implements IScopeFactory {
     }
 
     @Override
-    public com.vaadin.ui.Component getView() {
-        return scopeTabsFactory.createInstance(SCOPE_NAME);
+    public com.vaadin.ui.Component getView(UIContext context) {
+        return scopeTabsFactory.createInstance(SCOPE_NAME, context);
     }
 
     @Override

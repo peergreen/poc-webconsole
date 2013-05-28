@@ -254,7 +254,7 @@ public class BaseUI extends UI {
             public void buttonClick(Button.ClickEvent event) {
                 Subject subject = authenticateService.authenticate(username.getValue(), password.getValue());
                 if (subject != null) {
-                    ((SecurityManager) securityManager).setSubject(subject);
+                    securityManager = new SecurityManager(subject);
                     buildMainView();
                 }
                 else {
@@ -483,7 +483,7 @@ public class BaseUI extends UI {
             try {
                 nav.removeView("/" + scope.getSymbolicName());
                 try {
-                    scopesViews.put(scope.getSymbolicName(), scope.getView());
+                    scopesViews.put(scope.getSymbolicName(), scope.getView(new BaseUIContext(securityManager)));
                 } catch (Exception e) {
                     scopesViews.put(scope.getSymbolicName(), new ExceptionView(e));
                 }

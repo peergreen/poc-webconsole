@@ -27,7 +27,7 @@ public interface IScopeFactory {
      * Get scope view
      * @return instance of scope view
      */
-    Component getView();
+    Component getView(UIContext context);
 
     /**
      * Get scope button style
