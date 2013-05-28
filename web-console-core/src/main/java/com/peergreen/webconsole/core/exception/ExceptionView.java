@@ -24,7 +24,7 @@ public class ExceptionView extends VerticalLayout {
         top.setSpacing(true);
         top.addStyleName("toolbar");
         addComponent(top);
-        final Label title = new Label("A problem occurred when drawing this view");
+        final Label title = new Label("Oops ! A problem occurred when drawing this view");
         title.setSizeUndefined();
         title.addStyleName("h1");
         top.addComponent(title);
@@ -50,10 +50,10 @@ public class ExceptionView extends VerticalLayout {
         t.setSizeFull();
 
         int i = 1;
+        t.addItem(new Object[] {ex.toString()}, i++);
         for (StackTraceElement element : ex.getStackTrace()) {
             t.addItem(new Object[] {element.toString()}, i++);
         }
-
         CssLayout panel = new CssLayout();
         panel.addStyleName("layout-panel");
         panel.setSizeFull();

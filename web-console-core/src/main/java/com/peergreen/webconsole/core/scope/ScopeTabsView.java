@@ -40,12 +40,17 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
         Map of modules and there views registered in tabs
         Used for identify a tab
      */
-    private ConcurrentHashMap<IModuleFactory, Component> components;
+    private ConcurrentHashMap<IModuleFactory, Component> modulesViews = new ConcurrentHashMap<>();
+
+    /**
+     * List of modules in this view
+     */
+    private ConcurrentLinkedQueue<IModuleFactory> modules = new ConcurrentLinkedQueue<>();
 
     /**
      * List of scopes
      */
-    private List<String> scopes;
+    private List<String> scopes = new ArrayList<>();
 
     /**
      * Scope name
@@ -90,12 +95,9 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
         this.scopeName = scopeName;
         this.scopesRange = scopesRange;
         this.isDefaultScope = isDefaultScope;
-        this.securityManager = (ISecurityManager) VaadinSession.getCurrent().getAttribute("security.manager");
 
         setSizeFull();
 
-        components = new ConcurrentHashMap<>();
-        scopes = new ArrayList<>();
         tabs = new TabSheet();
         tabs.setSizeFull();
         tabs.addStyleName("borderless");
@@ -111,12 +113,28 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
         });
     }
 
+    @Override
+    public void attach() {
+        super.attach();
+        this.securityManager = (ISecurityManager) VaadinSession.getCurrent().getAttribute("security.manager");
+        addModules();
+    }
+
+    public void addModules() {
+        for (IModuleFactory moduleFactory : modules) {
+            if (!modulesViews.containsKey(moduleFactory) && canAddModule(moduleFactory)) {
+                addModule(moduleFactory);
+            }
+        }
+    }
+
     /**
      * Bind a new module
      * @param moduleFactory
      */
     @Bind(aggregate = true, optional = true)
     public void bindModule(IModuleFactory moduleFactory) {
+        modules.add(moduleFactory);
         if (canAddModule(moduleFactory)) {
             addModule(moduleFactory);
             scopelessModuleCollector.removeModule(moduleFactory);
@@ -130,9 +148,10 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
      */
     @Unbind
     public void unbindModule(IModuleFactory moduleFactory) {
-        if (components.containsKey(moduleFactory)) {
+        modules.remove(moduleFactory);
+        if (modulesViews.containsKey(moduleFactory)) {
             removeModule(moduleFactory);
-            if (components.isEmpty()) {
+            if (modulesViews.isEmpty()) {
                 notifierService.hideScopeButton(this);
             } else {
                 notifierService.decrementBadge(this);
@@ -150,7 +169,7 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
         if (isDefaultScope && !scopes.equals(scopeFactory.getSymbolicName())) {
             scopes.add(scopeFactory.getSymbolicName());
             // A scope was bound, check if its modules are under the default scope
-            for (Map.Entry<IModuleFactory, Component> component : components.entrySet()) {
+            for (Map.Entry<IModuleFactory, Component> component : modulesViews.entrySet()) {
                 if (scopeFactory.getSymbolicName().equals(component.getKey().getScope())) {
                     // Remove the module because its scope was bound
                     removeModule(component.getKey());
@@ -167,7 +186,7 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
         // is this views not for a default scope
         if (!isDefaultScope) {
             // This scope is unbound, add its modules to scopeless modules collector
-            for (Map.Entry<IModuleFactory, Component> component : components.entrySet()) {
+            for (Map.Entry<IModuleFactory, Component> component : modulesViews.entrySet()) {
                 scopelessModuleCollector.addModule(component.getKey());
             }
             // Notify default scopes that there is scopeless modules
@@ -176,6 +195,9 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
     }
 
     private boolean canAddModule(IModuleFactory moduleFactory) {
+        if (securityManager == null) {
+            return false;
+        }
         if (!securityManager.isUserInRoles(moduleFactory.getAllowedRoles())) {
             return false;
         }
@@ -195,7 +217,7 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
      * @param moduleFactory
      */
     private void addModule(IModuleFactory moduleFactory) {
-        if (!components.containsKey(moduleFactory)) {
+        if (!modulesViews.containsKey(moduleFactory)) {
             Component view;
             try {
                 view = moduleFactory.getView();
@@ -206,7 +228,7 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
             tabs.addComponent(view);
             tabs.getTab(view).setClosable(true);
             tabs.getTab(view).setCaption(moduleFactory.getName());
-            components.put(moduleFactory, view);
+            modulesViews.put(moduleFactory, view);
         }
     }
 
@@ -215,8 +237,8 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
      * @param moduleFactory
      */
     private void removeModule(IModuleFactory moduleFactory) {
-        tabs.removeComponent(components.get(moduleFactory));
-        components.remove(moduleFactory);
+        tabs.removeComponent(modulesViews.get(moduleFactory));
+        modulesViews.remove(moduleFactory);
     }
 
     /** {@inheritDoc}
