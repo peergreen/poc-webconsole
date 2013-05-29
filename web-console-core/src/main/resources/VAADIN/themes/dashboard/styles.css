@@ -4311,8 +4311,9 @@ body .dashboard.v-app-loading {
 }
 
 .dashboard .catalog .v-image {
-	width: 100px;
-	height: 145px;
+	/*width: 100px;*/
+	width: 120px;
+	/*height: 145px;*/
 	position: absolute;
 	top: 10px;
 	border: 2px solid rgba(255, 255, 255, 0.1);
@@ -4334,7 +4335,7 @@ body .dashboard.v-app-loading {
 }
 
 .dashboard .catalog .v-csslayout:before, .dashboard .cover:before {
-	content: "";
+	/*content: "";*/
 	display: block;
 	position: absolute;
 	top: 10px;
@@ -4353,8 +4354,10 @@ body .dashboard.v-app-loading {
 
 .dashboard .catalog .v-csslayout .v-caption {
 	position: relative;
-	padding-top: 160px;
-	width: 120px;
+	/*padding-top: 160px;*/
+	padding-top: 140px;
+	/*width: 120px;*/
+	width: 140px;
 	white-space: normal;
 	font-size: 12px;
 	padding-right: 1em;
@@ -4364,7 +4367,7 @@ body .dashboard.v-app-loading {
 
 .dashboard .catalog.v-layout {
 	padding: 20px 0 100px 30px;
-	background: #eee;
+	/*background: #eee;*/
 }
 
 .dashboard .schedule .tray {
