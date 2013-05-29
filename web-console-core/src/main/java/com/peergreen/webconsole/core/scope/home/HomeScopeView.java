@@ -1,13 +1,10 @@
-package com.peergreen.webconsole.core.scope;
+package com.peergreen.webconsole.core.scope.home;
 
 import com.peergreen.newsfeed.FeedMessage;
 import com.peergreen.newsfeed.Rss;
 import com.peergreen.newsfeed.RssService;
 import com.peergreen.newsfeed.RssServiceException;
-import com.peergreen.webconsole.core.api.IModuleFactory;
 import com.vaadin.event.ShortcutAction;
-import com.vaadin.navigator.View;
-import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;

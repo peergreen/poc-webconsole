@@ -1,10 +1,9 @@
-package com.peergreen.webconsole.core.scope;
+package com.peergreen.webconsole.core.scope.tabs;
 
-import com.peergreen.webconsole.core.api.INotifierService;
-import com.peergreen.webconsole.core.api.IScopeFactory;
-import com.peergreen.webconsole.core.api.IScopeTabsFactory;
-import com.peergreen.webconsole.core.api.IViewIPojoInstanceGarbageCollector;
-import com.peergreen.webconsole.core.api.UIContext;
+import com.peergreen.webconsole.scope.IScopeFactory;
+import com.peergreen.webconsole.scope.IScopeTabsFactory;
+import com.peergreen.webconsole.IViewIPojoInstanceGarbageCollector;
+import com.peergreen.webconsole.UIContext;
 import org.apache.felix.ipojo.ComponentInstance;
 import org.apache.felix.ipojo.ConfigurationException;
 import org.apache.felix.ipojo.Factory;
@@ -36,15 +35,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class ScopeTabsFactory implements IScopeTabsFactory {
 
     /**
-     * Notifier service
-     */
-    @Requires
-    INotifierService notifierService;
-
-    /**
      * Scope tabs view ipojo component factory
      */
-    @Requires(from = "com.peergreen.webconsole.core.scope.ScopeTabsView")
+    @Requires(from = "com.peergreen.webconsole.core.scope.tabs.ScopeTabsView")
     private Factory factory;
 
     /**

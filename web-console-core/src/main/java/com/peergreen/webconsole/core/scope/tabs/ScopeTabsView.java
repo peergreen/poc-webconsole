@@ -1,12 +1,12 @@
-package com.peergreen.webconsole.core.scope;
+package com.peergreen.webconsole.core.scope.tabs;
 
-import com.peergreen.webconsole.core.api.IDefaultScopeTabsView;
-import com.peergreen.webconsole.core.api.IModuleFactory;
-import com.peergreen.webconsole.core.api.INotifierService;
-import com.peergreen.webconsole.core.api.IScopeFactory;
-import com.peergreen.webconsole.core.api.IScopelessModuleCollector;
-import com.peergreen.webconsole.core.api.ISecurityManager;
-import com.peergreen.webconsole.core.api.UIContext;
+import com.peergreen.webconsole.core.scope.IDefaultScopeTabsView;
+import com.peergreen.webconsole.module.IModuleFactory;
+import com.peergreen.webconsole.INotifierService;
+import com.peergreen.webconsole.scope.IScopeFactory;
+import com.peergreen.webconsole.IScopelessModuleCollector;
+import com.peergreen.webconsole.ISecurityManager;
+import com.peergreen.webconsole.UIContext;
 import com.peergreen.webconsole.core.exception.ExceptionView;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
@@ -80,6 +80,11 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
     private boolean isDefaultScope;
 
     /**
+     * Default tab
+     */
+    private DefaultTab defaultTab;
+
+    /**
      * Init tabs scope view
      * @param scopeName
      * @param scopesRange
@@ -97,12 +102,16 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
         tabs = new TabSheet();
         tabs.setSizeFull();
         tabs.addStyleName("borderless");
+        defaultTab = new DefaultTab(tabs);
+        tabs.addComponent(defaultTab);
+        tabs.getTab(defaultTab).setClosable(false);
+        tabs.getTab(defaultTab).setCaption(scopeName.substring(0, 1).toUpperCase() + scopeName.substring(1).toLowerCase());
         addComponent(tabs);
 
         tabs.setCloseHandler(new TabSheet.CloseHandler() {
             @Override
             public void onTabClose(TabSheet tabsheet, Component tabContent) {
-                notifierService.addNotification("Attention ! You have closed " +
+                notifierService.addNotification("Warning ! You have closed " +
                         tabsheet.getTab(tabContent).getCaption() + " module");
                 tabsheet.removeComponent(tabContent);
             }
@@ -205,6 +214,7 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
             tabs.getTab(view).setClosable(true);
             tabs.getTab(view).setCaption(moduleFactory.getName());
             modulesViews.put(moduleFactory, view);
+            defaultTab.addModuleButtonInDefaultTab(moduleFactory, view);
         }
     }
 
@@ -215,6 +225,7 @@ public class ScopeTabsView extends CssLayout implements IDefaultScopeTabsView {
     private void removeModule(IModuleFactory moduleFactory) {
         tabs.removeComponent(modulesViews.get(moduleFactory));
         modulesViews.remove(moduleFactory);
+        defaultTab.removeModuleButtonFromDefautlTab(moduleFactory);
     }
 
     /** {@inheritDoc}

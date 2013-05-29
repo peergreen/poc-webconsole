@@ -1,9 +1,8 @@
-package com.peergreen.webconsole.core.scope;
+package com.peergreen.webconsole.core.scope.home;
 
 import com.peergreen.newsfeed.RssService;
-import com.peergreen.webconsole.core.api.IScopeFactory;
-import com.peergreen.webconsole.core.api.UIContext;
-import com.vaadin.navigator.View;
+import com.peergreen.webconsole.scope.IScopeFactory;
+import com.peergreen.webconsole.UIContext;
 import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Instantiate;
 import org.apache.felix.ipojo.annotations.Provides;
