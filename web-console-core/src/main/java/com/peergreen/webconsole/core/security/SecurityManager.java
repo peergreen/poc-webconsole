@@ -1,6 +1,6 @@
 package com.peergreen.webconsole.core.security;
 
-import com.peergreen.webconsole.core.api.ISecurityManager;
+import com.peergreen.webconsole.ISecurityManager;
 
 import javax.security.auth.Subject;
 import java.security.Principal;

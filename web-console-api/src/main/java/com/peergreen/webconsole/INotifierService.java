@@ -1,7 +1,6 @@
-package com.peergreen.webconsole.core.api;
+package com.peergreen.webconsole;
 
-import com.peergreen.webconsole.core.notifier.NotificationOverlay;
-import com.vaadin.navigator.View;
+import com.peergreen.webconsole.NotificationOverlay;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 

@@ -7,7 +7,7 @@
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.peergreen</groupId>
+  <groupId>com.peergreen.webconsole</groupId>
   <artifactId>web-console</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>Peergreen Web Console</name>
@@ -17,6 +17,7 @@
     <module>web-console-core</module>
     <module>web-console-modules</module>
     <module>web-console-pgadmin</module>
+    <module>web-console-api</module>
   </modules>
 
   <properties>

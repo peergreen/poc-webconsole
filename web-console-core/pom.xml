@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.peergreen</groupId>
+    <groupId>com.peergreen.webconsole</groupId>
     <artifactId>web-console</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
@@ -14,20 +14,13 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.peergreen.webconsole</groupId>
+      <artifactId>web-console-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-server</artifactId>
-      <version>${vaadin.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-theme-compiler</artifactId>
-      <version>${vaadin.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-themes</artifactId>
       <version>${vaadin.version}</version>
       <scope>provided</scope>
     </dependency>

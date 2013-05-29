@@ -1,7 +1,7 @@
 package com.peergreen.webconsole.core.vaadin7;
 
-import com.peergreen.webconsole.core.api.IConsole;
-import com.peergreen.webconsole.core.api.IUIProviderFactory;
+import com.peergreen.webconsole.IConsole;
+import com.peergreen.webconsole.core.IUIProviderFactory;
 import com.vaadin.server.UIProvider;
 import org.apache.felix.ipojo.ComponentInstance;
 import org.apache.felix.ipojo.ConfigurationException;

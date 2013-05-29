@@ -1,6 +1,6 @@
-package com.peergreen.webconsole.core.api;
+package com.peergreen.webconsole;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
+import com.peergreen.webconsole.module.IModuleFactory;
 
 /**
  * Scopeless modules collector

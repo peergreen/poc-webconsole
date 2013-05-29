@@ -1,6 +1,6 @@
 package com.peergreen.webconsole.core.security;
 
-import com.peergreen.webconsole.core.api.IViewIPojoInstanceGarbageCollector;
+import com.peergreen.webconsole.IViewIPojoInstanceGarbageCollector;
 import com.vaadin.ui.Component;
 import org.apache.felix.ipojo.ComponentInstance;
 import org.apache.felix.ipojo.annotations.Instantiate;

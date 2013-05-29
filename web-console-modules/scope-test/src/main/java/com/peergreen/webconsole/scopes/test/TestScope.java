@@ -1,19 +1,12 @@
 package com.peergreen.webconsole.scopes.test;
 
-import com.peergreen.webconsole.core.api.IModuleFactory;
-import com.peergreen.webconsole.core.api.INotifierService;
-import com.peergreen.webconsole.core.api.IScopeFactory;
-import com.peergreen.webconsole.core.api.IScopeTabsFactory;
-import com.peergreen.webconsole.core.api.UIContext;
-import com.vaadin.navigator.View;
-import org.apache.felix.ipojo.annotations.Bind;
+import com.peergreen.webconsole.scope.IScopeFactory;
+import com.peergreen.webconsole.scope.IScopeTabsFactory;
+import com.peergreen.webconsole.UIContext;
 import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Instantiate;
-import org.apache.felix.ipojo.annotations.Invalidate;
 import org.apache.felix.ipojo.annotations.Provides;
 import org.apache.felix.ipojo.annotations.Requires;
-import org.apache.felix.ipojo.annotations.Unbind;
-import org.apache.felix.ipojo.annotations.Validate;
 
 import java.util.ArrayList;
 import java.util.List;

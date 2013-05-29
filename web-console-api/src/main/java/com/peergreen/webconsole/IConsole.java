@@ -1,4 +1,4 @@
-package com.peergreen.webconsole.core.api;
+package com.peergreen.webconsole;
 
 /**
  * Console definition

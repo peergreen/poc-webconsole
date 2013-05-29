@@ -1,7 +1,6 @@
 package com.peergreen.webconsole.core;
 
-import com.peergreen.webconsole.core.api.IConsole;
-import com.peergreen.webconsole.core.api.IUIProviderFactory;
+import com.peergreen.webconsole.IConsole;
 import com.peergreen.webconsole.core.osgi.VaadinOSGiServlet;
 import com.vaadin.server.UIProvider;
 import org.apache.felix.ipojo.annotations.Bind;

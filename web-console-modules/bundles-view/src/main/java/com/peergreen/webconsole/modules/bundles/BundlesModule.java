@@ -1,7 +1,6 @@
 package com.peergreen.webconsole.modules.bundles;
 
-import com.peergreen.webconsole.core.api.IModuleFactory;
-import com.vaadin.ui.ProgressIndicator;
+import com.peergreen.webconsole.module.IModuleFactory;
 import org.apache.felix.ipojo.annotations.Instantiate;
 import org.apache.felix.ipojo.annotations.Provides;
 import org.osgi.framework.Bundle;
@@ -9,11 +8,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 
 import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.NativeButton;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 

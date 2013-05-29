@@ -1,6 +1,6 @@
-package com.peergreen.webconsole.core.api;
+package com.peergreen.webconsole.scope;
 
-import com.vaadin.navigator.View;
+import com.peergreen.webconsole.UIContext;
 import com.vaadin.ui.Component;
 
 import java.util.List;

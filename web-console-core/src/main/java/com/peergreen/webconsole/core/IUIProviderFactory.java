@@ -1,5 +1,6 @@
-package com.peergreen.webconsole.core.api;
+package com.peergreen.webconsole.core;
 
+import com.peergreen.webconsole.IConsole;
 import com.vaadin.server.UIProvider;
 
 /**

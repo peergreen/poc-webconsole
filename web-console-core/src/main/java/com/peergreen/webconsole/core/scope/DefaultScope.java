@@ -1,8 +1,8 @@
 package com.peergreen.webconsole.core.scope;
 
-import com.peergreen.webconsole.core.api.IScopeFactory;
-import com.peergreen.webconsole.core.api.IScopeTabsFactory;
-import com.peergreen.webconsole.core.api.UIContext;
+import com.peergreen.webconsole.scope.IScopeFactory;
+import com.peergreen.webconsole.scope.IScopeTabsFactory;
+import com.peergreen.webconsole.UIContext;
 import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Instantiate;
 import org.apache.felix.ipojo.annotations.Provides;

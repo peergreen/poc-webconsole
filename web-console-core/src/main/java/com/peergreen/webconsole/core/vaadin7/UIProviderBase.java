@@ -1,6 +1,6 @@
 package com.peergreen.webconsole.core.vaadin7;
 
-import com.peergreen.webconsole.core.api.IConsole;
+import com.peergreen.webconsole.IConsole;
 import com.vaadin.server.UIClassSelectionEvent;
 import com.vaadin.server.UICreateEvent;
 import com.vaadin.server.UIProvider;

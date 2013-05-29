@@ -10,8 +10,8 @@
 
 package com.peergreen.webconsole.core.notifier;
 
-import com.peergreen.webconsole.core.api.INotifierService;
-import com.vaadin.navigator.View;
+import com.peergreen.webconsole.NotificationOverlay;
+import com.peergreen.webconsole.INotifierService;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
@@ -23,7 +23,6 @@ import org.apache.felix.ipojo.annotations.Provides;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Notifier service

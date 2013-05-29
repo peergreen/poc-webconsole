@@ -1,7 +1,7 @@
 package com.peergreen.webconsole.core.context;
 
-import com.peergreen.webconsole.core.api.ISecurityManager;
-import com.peergreen.webconsole.core.api.UIContext;
+import com.peergreen.webconsole.ISecurityManager;
+import com.peergreen.webconsole.UIContext;
 
 /**
  * Created with IntelliJ IDEA.

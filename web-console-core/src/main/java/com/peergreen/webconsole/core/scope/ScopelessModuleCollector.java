@@ -1,8 +1,7 @@
 package com.peergreen.webconsole.core.scope;
 
-import com.peergreen.webconsole.core.api.IDefaultScopeTabsView;
-import com.peergreen.webconsole.core.api.IModuleFactory;
-import com.peergreen.webconsole.core.api.IScopelessModuleCollector;
+import com.peergreen.webconsole.module.IModuleFactory;
+import com.peergreen.webconsole.IScopelessModuleCollector;
 import org.apache.felix.ipojo.annotations.Bind;
 import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Instantiate;

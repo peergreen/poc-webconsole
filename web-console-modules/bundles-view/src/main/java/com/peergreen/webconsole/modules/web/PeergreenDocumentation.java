@@ -1,6 +1,6 @@
 package com.peergreen.webconsole.modules.web;
 
-import com.peergreen.webconsole.core.api.IModuleFactory;
+import com.peergreen.webconsole.module.IModuleFactory;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.Component;

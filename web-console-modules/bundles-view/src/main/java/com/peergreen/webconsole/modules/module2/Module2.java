@@ -2,7 +2,7 @@ package com.peergreen.webconsole.modules.module2;
 
 import static java.lang.String.format;
 
-import com.peergreen.webconsole.core.api.IModuleFactory;
+import com.peergreen.webconsole.module.IModuleFactory;
 import org.apache.felix.ipojo.annotations.Instantiate;
 import org.apache.felix.ipojo.annotations.Provides;
 import org.osgi.framework.BundleContext;

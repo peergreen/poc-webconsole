@@ -1,4 +1,4 @@
-package com.peergreen.webconsole.core.notifier;
+package com.peergreen.webconsole;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;

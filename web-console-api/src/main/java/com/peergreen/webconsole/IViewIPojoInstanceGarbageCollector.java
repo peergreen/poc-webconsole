@@ -1,4 +1,4 @@
-package com.peergreen.webconsole.core.api;
+package com.peergreen.webconsole;
 
 import com.vaadin.ui.Component;
 import org.apache.felix.ipojo.ComponentInstance;

@@ -1,6 +1,6 @@
 package com.peergreen.webconsole.modules.module3;
 
-import com.peergreen.webconsole.core.api.IModuleFactory;
+import com.peergreen.webconsole.module.IModuleFactory;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
 import org.apache.felix.ipojo.annotations.Instantiate;

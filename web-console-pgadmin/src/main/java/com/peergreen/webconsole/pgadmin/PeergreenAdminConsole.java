@@ -1,6 +1,6 @@
 package com.peergreen.webconsole.pgadmin;
 
-import com.peergreen.webconsole.core.api.IConsole;
+import com.peergreen.webconsole.IConsole;
 import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Instantiate;
 import org.apache.felix.ipojo.annotations.Provides;

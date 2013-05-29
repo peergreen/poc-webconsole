@@ -1,4 +1,6 @@
-package com.peergreen.webconsole.core.api;
+package com.peergreen.webconsole.core.scope;
+
+import com.peergreen.webconsole.module.IModuleFactory;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 

@@ -1,14 +1,14 @@
 package com.peergreen.webconsole.core.vaadin7;
 
 import com.peergreen.security.UsernamePasswordAuthenticateService;
-import com.peergreen.webconsole.core.api.INotifierService;
-import com.peergreen.webconsole.core.api.IScopeFactory;
-import com.peergreen.webconsole.core.api.ISecurityManager;
-import com.peergreen.webconsole.core.api.IViewIPojoInstanceGarbageCollector;
+import com.peergreen.webconsole.INotifierService;
+import com.peergreen.webconsole.scope.IScopeFactory;
+import com.peergreen.webconsole.ISecurityManager;
+import com.peergreen.webconsole.IViewIPojoInstanceGarbageCollector;
 import com.peergreen.webconsole.core.context.BaseUIContext;
 import com.peergreen.webconsole.core.exception.ExceptionView;
-import com.peergreen.webconsole.core.notifier.NotificationOverlay;
-import com.peergreen.webconsole.core.scope.HomeScope;
+import com.peergreen.webconsole.NotificationOverlay;
+import com.peergreen.webconsole.core.scope.home.HomeScope;
 import com.peergreen.webconsole.core.scope.ScopeNavView;
 import com.peergreen.webconsole.core.security.SecurityManager;
 import com.vaadin.annotations.PreserveOnRefresh;

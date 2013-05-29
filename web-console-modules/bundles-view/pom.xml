@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <artifactId>web-console-modules</artifactId>
-    <groupId>com.peergreen</groupId>
+    <groupId>com.peergreen.webconsole</groupId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
@@ -24,9 +24,9 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>com.peergreen</groupId>
-      <artifactId>web-console-core</artifactId>
-      <version>${project.parent.version}</version>
+      <groupId>com.peergreen.webconsole</groupId>
+      <artifactId>web-console-api</artifactId>
+      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
