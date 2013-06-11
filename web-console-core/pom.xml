@@ -44,6 +44,12 @@
     </dependency>
     <dependency>
       <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-push</artifactId>
+      <scope>provided</scope>
+      <version>${vaadin.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.vaadin</groupId>
       <artifactId>vaadin-shared-deps</artifactId>
       <scope>provided</scope>
       <version>1.0.2</version>

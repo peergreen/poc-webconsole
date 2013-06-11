@@ -1,5 +1,7 @@
 package com.peergreen.webconsole.core.osgi;
 
+import javax.servlet.annotation.WebServlet;
+
 import com.vaadin.server.DeploymentConfiguration;
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.SessionInitEvent;
@@ -13,6 +15,7 @@ import com.vaadin.server.VaadinServletService;
  * to add Vaadin UI provider dynamically
  * @author Mohammed Boukada
  */
+@WebServlet(asyncSupported=true)
 public class VaadinOSGiServlet extends VaadinServlet {
 
     /**

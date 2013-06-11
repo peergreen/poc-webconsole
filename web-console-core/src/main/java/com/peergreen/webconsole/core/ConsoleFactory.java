@@ -1,8 +1,7 @@
 package com.peergreen.webconsole.core;
 
-import com.peergreen.webconsole.IConsole;
-import com.peergreen.webconsole.core.osgi.VaadinOSGiServlet;
-import com.vaadin.server.UIProvider;
+import javax.servlet.ServletException;
+
 import org.apache.felix.ipojo.annotations.Bind;
 import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Instantiate;
@@ -13,7 +12,9 @@ import org.apache.felix.ipojo.annotations.Validate;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
 
-import javax.servlet.ServletException;
+import com.peergreen.webconsole.IConsole;
+import com.peergreen.webconsole.core.osgi.VaadinOSGiServlet;
+import com.vaadin.server.UIProvider;
 
 /**
  * Console factory
@@ -45,12 +46,12 @@ public class ConsoleFactory {
      */
     @Validate
     public void start() {
-        try {
+        //try {
             // Register resources
-            httpService.registerResources(RESOURCE_BASE, RESOURCE_BASE, null);
-        } catch (NamespaceException e) {
-            e.printStackTrace();
-        }
+            //httpService.registerResources(RESOURCE_BASE, RESOURCE_BASE, null);
+        //} catch (NamespaceException e) {
+        //    e.printStackTrace();
+        //}
     }
 
     /**

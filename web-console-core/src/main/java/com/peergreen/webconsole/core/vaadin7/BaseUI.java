@@ -1,17 +1,31 @@
 package com.peergreen.webconsole.core.vaadin7;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.security.auth.Subject;
+
+import org.apache.felix.ipojo.annotations.Bind;
+import org.apache.felix.ipojo.annotations.Provides;
+import org.apache.felix.ipojo.annotations.Requires;
+import org.apache.felix.ipojo.annotations.Unbind;
+
 import com.peergreen.security.UsernamePasswordAuthenticateService;
 import com.peergreen.webconsole.INotifierService;
-import com.peergreen.webconsole.scope.IScopeFactory;
 import com.peergreen.webconsole.ISecurityManager;
 import com.peergreen.webconsole.IViewIPojoInstanceGarbageCollector;
+import com.peergreen.webconsole.NotificationOverlay;
 import com.peergreen.webconsole.core.context.BaseUIContext;
 import com.peergreen.webconsole.core.exception.ExceptionView;
-import com.peergreen.webconsole.NotificationOverlay;
-import com.peergreen.webconsole.core.scope.home.HomeScope;
 import com.peergreen.webconsole.core.scope.ScopeNavView;
+import com.peergreen.webconsole.core.scope.home.HomeScope;
 import com.peergreen.webconsole.core.security.SecurityManager;
+import com.peergreen.webconsole.scope.IScopeFactory;
 import com.vaadin.annotations.PreserveOnRefresh;
+import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
@@ -37,17 +51,6 @@ import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import org.apache.felix.ipojo.annotations.Bind;
-import org.apache.felix.ipojo.annotations.Provides;
-import org.apache.felix.ipojo.annotations.Requires;
-import org.apache.felix.ipojo.annotations.Unbind;
-
-import javax.security.auth.Subject;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Base console UI
@@ -57,6 +60,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @PreserveOnRefresh
 @org.apache.felix.ipojo.annotations.Component
 @Provides(specifications = BaseUI.class)
+@Push
 public class BaseUI extends UI {
 
     /**
@@ -87,22 +91,22 @@ public class BaseUI extends UI {
     /**
      * Scopes bound
      */
-    private ConcurrentHashMap<String, IScopeFactory> scopes = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, IScopeFactory> scopes = new ConcurrentHashMap<>();
 
     /**
      * Scopes views
      */
-    private ConcurrentHashMap<String, com.vaadin.ui.Component> scopesViews = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, com.vaadin.ui.Component> scopesViews = new ConcurrentHashMap<>();
 
     /**
      * Buttons related name
      */
-    private HashMap<String, Button> viewNameToMenuButton = new HashMap<>();
+    private final HashMap<String, Button> viewNameToMenuButton = new HashMap<>();
 
     /**
      * Console name
       */
-    private String consoleName;
+    private final String consoleName;
 
     /**
      * Whether the UI was built
