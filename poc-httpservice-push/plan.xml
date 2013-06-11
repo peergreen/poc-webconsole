@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deployment-plan xmlns="http://jonas.ow2.org/ns/deployment-plan/1.0"
+                 xmlns:m2="http://jonas.ow2.org/ns/deployment-plan/maven2/1.0"
+                 xmlns:url="http://jonas.ow2.org/ns/deployment-plan/url/1.0"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://jonas.ow2.org/ns/deployment-plan/1.0
+                                     http://jonas.ow2.org/ns/deployment-plan/1.0/deployment-plan-1.0.1.xsd
+                                     http://jonas.ow2.org/ns/deployment-plan/maven2/1.0
+                                     http://jonas.ow2.org/ns/deployment-plan/maven2-deployment-plan-1.0.xsd"
+                 atomic="false" id="push-demo">
+  <deployment id="slf4j-api:jar" xsi:type="m2:maven2-deploymentType">
+    <m2:groupId>org.slf4j</m2:groupId>
+    <m2:artifactId>slf4j-api</m2:artifactId>
+    <m2:version>1.7.2</m2:version>
+    <m2:type>jar</m2:type>
+  </deployment>
+  <deployment id="slf4j-simple:jar" xsi:type="m2:maven2-deploymentType">
+    <m2:groupId>org.slf4j</m2:groupId>
+    <m2:artifactId>slf4j-simple</m2:artifactId>
+    <m2:version>1.7.2</m2:version>
+    <m2:type>jar</m2:type>
+  </deployment>
+  <deployment id="jsoup" xsi:type="m2:maven2-deploymentType">
+    <m2:groupId>org.jsoup</m2:groupId>
+    <m2:artifactId>jsoup</m2:artifactId>
+    <m2:version>1.6.3</m2:version>
+    <m2:type>jar</m2:type>
+  </deployment>
+  <deployment id="atmosphere" xsi:type="m2:maven2-deploymentType">
+    <m2:groupId>org.atmosphere</m2:groupId>
+    <m2:artifactId>atmosphere-runtime</m2:artifactId>
+    <m2:version>1.0.12</m2:version>
+    <m2:type>jar</m2:type>
+  </deployment>
+  <deployment id="vaadin-deps" xsi:type="m2:maven2-deploymentType">
+    <m2:groupId>com.vaadin</m2:groupId>
+    <m2:artifactId>vaadin-shared-deps</m2:artifactId>
+    <m2:version>1.0.2</m2:version>
+    <m2:type>jar</m2:type>
+  </deployment>
+  <deployment id="vaadin-all:jar" xsi:type="m2:maven2-deploymentType">
+    <m2:groupId>com.peergreen.webconsole</m2:groupId>
+    <m2:artifactId>vaadin-all</m2:artifactId>
+    <m2:version>0.0.1-SNAPSHOT</m2:version>
+    <m2:type>jar</m2:type>
+  </deployment>
+  <deployment id="poc-push:jar" xsi:type="m2:maven2-deploymentType">
+    <m2:groupId>com.peergreen.poc</m2:groupId>
+    <m2:artifactId>poc-htttpservice-push</m2:artifactId>
+    <m2:version>0.0.1-SNAPSHOT</m2:version>
+    <m2:type>jar</m2:type>
+  </deployment>
+  <deployment id="poc-push:jar" xsi:type="m2:maven2-deploymentType">
+    <m2:groupId>com.peergreen.poc</m2:groupId>
+    <m2:artifactId>poc-htttpservice-push-button</m2:artifactId>
+    <m2:version>0.0.1-SNAPSHOT</m2:version>
+    <m2:type>jar</m2:type>
+  </deployment>
+
+</deployment-plan>

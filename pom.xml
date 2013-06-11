@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <groupId>com.peergreen</groupId>
     <artifactId>peergreen-pom</artifactId>
@@ -18,6 +18,9 @@
     <module>web-console-modules</module>
     <module>web-console-pgadmin</module>
     <module>web-console-api</module>
+    <module>vaadin-all</module>
+    <module>poc-httpservice-push</module>
+    <module>poc-httpservice-push-button</module>
   </modules>
 
   <properties>
@@ -66,9 +69,27 @@
     <pluginRepository>
       <id>apache-snapshots-plugin</id>
       <url>https://repository.apache.org/content/repositories/orgapachefelix-024/</url>
-      <releases><enabled>true</enabled></releases>
-      <snapshots><enabled>false</enabled></snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
     </pluginRepository>
   </pluginRepositories>
+
+  <repositories>
+    <repository>
+      <id>vaadin-snapshots</id>
+      <url>http://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
 
 </project>
