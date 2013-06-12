@@ -10,7 +10,6 @@ import com.peergreen.webconsole.ISecurityManager;
 import com.peergreen.webconsole.core.context.BaseUIContext;
 import com.peergreen.webconsole.core.exception.ExceptionView;
 import com.peergreen.webconsole.core.scope.ScopeFactory;
-import com.peergreen.webconsole.core.scope.home.HomeScopeViewFactory;
 import com.peergreen.webconsole.core.security.SecurityManager;
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Theme;
@@ -600,7 +599,8 @@ public class BaseUI extends UI {
     private void removeRouteFromNav(String scopeName) {
         if (nav != null) {
             nav.removeView("/" + scopeName);
-            if (HomeScopeViewFactory.SCOPE_NAME.equals(scopeName)) {
+            // TODO change 'test' by 'home' when home scope one is available
+            if ("test".equals(scopeName)) {
                 nav.removeView("");
                 nav.removeView("/");
             }
