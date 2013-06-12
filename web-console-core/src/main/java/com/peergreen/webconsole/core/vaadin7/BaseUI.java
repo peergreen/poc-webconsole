@@ -1,24 +1,25 @@
 package com.peergreen.webconsole.core.vaadin7;
 
 import com.peergreen.security.UsernamePasswordAuthenticateService;
+import com.peergreen.webconsole.Constants;
+import com.peergreen.webconsole.ExtensionFactory;
 import com.peergreen.webconsole.INotifierService;
-import com.peergreen.webconsole.scope.IScopeFactory;
+import com.peergreen.webconsole.core.scope.NavigatorView;
+import com.peergreen.webconsole.core.scope.Scope;
 import com.peergreen.webconsole.ISecurityManager;
-import com.peergreen.webconsole.IViewIPojoInstanceGarbageCollector;
 import com.peergreen.webconsole.core.context.BaseUIContext;
 import com.peergreen.webconsole.core.exception.ExceptionView;
-import com.peergreen.webconsole.NotificationOverlay;
-import com.peergreen.webconsole.core.scope.home.HomeScope;
-import com.peergreen.webconsole.core.scope.ScopeNavView;
+import com.peergreen.webconsole.core.scope.ScopeFactory;
+import com.peergreen.webconsole.core.scope.home.HomeScopeViewFactory;
 import com.peergreen.webconsole.core.security.SecurityManager;
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Theme;
+import com.vaadin.data.Property;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
-import com.vaadin.server.Page;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -34,16 +35,17 @@ import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.NativeButton;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.PasswordField;
+import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import org.apache.felix.ipojo.annotations.Bind;
-import org.apache.felix.ipojo.annotations.Provides;
+import org.apache.felix.ipojo.annotations.Invalidate;
 import org.apache.felix.ipojo.annotations.Requires;
 import org.apache.felix.ipojo.annotations.Unbind;
 
 import javax.security.auth.Subject;
-import java.util.HashMap;
+import java.util.Dictionary;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
@@ -56,7 +58,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Theme("dashboard")
 @PreserveOnRefresh
 @org.apache.felix.ipojo.annotations.Component
-@Provides(specifications = BaseUI.class)
 public class BaseUI extends UI {
 
     /**
@@ -70,44 +71,49 @@ public class BaseUI extends UI {
     VerticalLayout loginLayout;
 
     /**
+     * Progress indicatorlayout
+     */
+    VerticalLayout progressIndicatorLayout;
+
+    /**
      * Menu layout
      */
-    CssLayout menu = new CssLayout();
+    CssLayout menu;
 
     /**
      * Content layout
      */
-    CssLayout content = new CssLayout();
+    CssLayout content;
 
     /**
-     * To navigate between scopes views
+     * Main content layout
+     */
+    HorizontalLayout main;
+
+    /**
+     * Progress indicator
+     */
+    ProgressIndicator progressIndicator = new ProgressIndicator(new Float(0.0));
+
+    int nbScopesToBound = 0;
+
+    /**
+     * To navigate between scopesFactories views
      */
     private Navigator nav;
 
     /**
      * Scopes bound
      */
-    private ConcurrentHashMap<String, IScopeFactory> scopes = new ConcurrentHashMap<>();
-
-    /**
-     * Scopes views
-     */
-    private ConcurrentHashMap<String, com.vaadin.ui.Component> scopesViews = new ConcurrentHashMap<>();
-
-    /**
-     * Buttons related name
-     */
-    private HashMap<String, Button> viewNameToMenuButton = new HashMap<>();
+    private Map<ExtensionFactory, ScopeFactory> scopesFactories = new ConcurrentHashMap<>();
+    private Map<String, Scope> scopes = new ConcurrentHashMap<>();
 
     /**
      * Console name
       */
     private String consoleName;
 
-    /**
-     * Whether the UI was built
-     */
-    private boolean uiIsBuilt = false;
+    private String scopeExtensionPoint;
 
     /**
      * Security manager
@@ -115,48 +121,87 @@ public class BaseUI extends UI {
     private ISecurityManager securityManager;
 
     /**
+     * UI id
+     */
+    private Integer uiId;
+
+    /**
      * Notifier service
      */
     @Requires
     private INotifierService notifierService;
 
+    /**
+     * Authentication service
+     */
     @Requires
     private UsernamePasswordAuthenticateService authenticateService;
 
-    @Requires
-    private IViewIPojoInstanceGarbageCollector viewIPojoInstanceGarbageCollector;
-
     /**
      * Base console UI constructor
-     * @param consoleName
      */
-    public BaseUI(String consoleName) {
+    public BaseUI(String consoleName, String extensionPoint, int uiId) {
         this.consoleName = consoleName;
+        this.scopeExtensionPoint = extensionPoint;
+        this.uiId = uiId;
+    }
+
+    @Invalidate
+    public void stop() {
+        System.out.print("");
     }
 
     /**
      * Bind a scope factory
-     * @param scope
+     * @param extensionFactory
      */
     @Bind(aggregate = true, optional = true)
-    public void bindScope(IScopeFactory scope) {
-        scopes.put(scope.getSymbolicName(), scope);
-        addRouteToNav(scope);
-        addScopeButtonInMenu(scope, true);
+    public void bindExtensionFactory(ExtensionFactory extensionFactory, Dictionary props) {
+        if (canAddExtensionFactory(props)) {
+            String roles[] = (String[]) props.get(Constants.EXTENSION_ROLES);
+            scopesFactories.remove(extensionFactory);
+            ScopeFactory scopeFactory = new ScopeFactory(roles);
+            if (progressIndicator.getValue() >= 1) {
+                scopeFactory.setInstance(extensionFactory.create(new BaseUIContext(securityManager, uiId)));
+            }
+            scopesFactories.put(extensionFactory, scopeFactory);
+        }
     }
 
     /**
      * Unbind a scope factory
-     * @param scope
+     * @param extensionFactory
      */
     @Unbind
-    public void unbindScope(IScopeFactory scope) {
-        if (scopes.containsKey(scope.getSymbolicName())) {
-            removeRouteFromNav(scope);
-            removeScopeButtonInMenu(scope);
-            scopes.remove(scope.getSymbolicName());
-            scopesViews.remove(scope.getSymbolicName());
+    public void unbindExtensionFactory(ExtensionFactory extensionFactory) {
+        if (scopesFactories.containsKey(extensionFactory)) {
+            if (scopesFactories.get(extensionFactory).getInstance() != null) {
+                scopesFactories.get(extensionFactory).getInstance().stop();
+            }
+            scopesFactories.remove(extensionFactory);
         }
+    }
+
+    private boolean canAddExtensionFactory(Dictionary props) {
+        String extensionId = (String) props.get(Constants.EXTENSION_POINT);
+        return extensionId != null && scopeExtensionPoint.equals(extensionId);
+    }
+
+    @Bind(aggregate = true, optional = true)
+    public void bindScopeView(Component scopeView, Dictionary props) {
+        String scopeName = (String) props.get("scope.name");
+        Scope scope = new Scope(scopeName, scopeView);
+        scopes.put(scopeName, scope);
+        addRouteToNav(scopeName, scopeView);
+        addScopeButtonInMenu(scopeName, scopeView, progressIndicator.getValue() >= 1);
+    }
+
+    @Unbind
+    public void unbindScopeView(Component scopeView, Dictionary props) {
+        String scopeName = (String) props.get("scope.name");
+        removeRouteFromNav(scopeName);
+        removeScopeButtonInMenu(scopeName);
+        scopes.remove(scopeName);
     }
 
     /**
@@ -166,7 +211,6 @@ public class BaseUI extends UI {
     @Override
     protected void init(VaadinRequest request) {
         setLocale(Locale.US);
-
         getPage().setTitle(consoleName);
         setContent(root);
         root.addStyleName("root");
@@ -177,7 +221,13 @@ public class BaseUI extends UI {
         bg.addStyleName("login-bg");
         root.addComponent(bg);
 
-        buildLoginView(false);
+        Boolean isLogged = (Boolean) getSession().getAttribute("is.logged");
+        if(isLogged != null && isLogged) {
+            securityManager = (ISecurityManager) getSession().getAttribute("security.manager");
+            buildMainView();
+        } else {
+            buildLoginView(false);
+        }
     }
 
     /**
@@ -189,13 +239,6 @@ public class BaseUI extends UI {
             root.removeAllComponents();
         }
         notifierService.closeAll();
-        NotificationOverlay w = notifierService
-                .addOverlay(
-                        "",
-                        "Welcome to " + consoleName,
-                        "login");
-        w.center();
-        addWindow(w);
 
         addStyleName("login");
 
@@ -210,11 +253,9 @@ public class BaseUI extends UI {
         HorizontalLayout labels = new HorizontalLayout();
         labels.setWidth("100%");
         labels.setMargin(true);
-        //labels.addStyleName("labels");
         loginPanel.addComponent(labels);
 
         Label welcome = new Label("Welcome");
-        //welcome.setSizeUndefined();
         welcome.addStyleName("h4");
         labels.addComponent(welcome);
         labels.setComponentAlignment(welcome, Alignment.MIDDLE_LEFT);
@@ -257,6 +298,8 @@ public class BaseUI extends UI {
                 Subject subject = authenticateService.authenticate(username.getValue(), password.getValue());
                 if (subject != null) {
                     securityManager = new SecurityManager(subject);
+                    getSession().setAttribute("is.logged", true);
+                    getSession().setAttribute("security.manager", securityManager);
                     buildMainView();
                 }
                 else {
@@ -291,19 +334,14 @@ public class BaseUI extends UI {
      * Build main view
      */
     private void buildMainView() {
-        if (!securityManager.isUserLogged()) {
-            buildLoginView(true);
-        }
-
-        uiIsBuilt = true;
-        buildRoutes();
+        menu = new CssLayout();
+        content = new CssLayout();
+        //buildRoutes();
 
         notifierService.closeAll();
-        removeStyleName("login");
-        root.removeComponent(loginLayout);
 
         // Build menu layout
-        root.addComponent(new HorizontalLayout() {
+        main = new HorizontalLayout() {
             {
                 setSizeFull();
                 addStyleName("main-view");
@@ -370,9 +408,16 @@ public class BaseUI extends UI {
                                     @Override
                                     public void buttonClick(Button.ClickEvent event) {
                                         ((SecurityManager) securityManager).setUserLogged(false);
-                                        for (Map.Entry<String, Component> scopeView : scopesViews.entrySet()) {
-                                            viewIPojoInstanceGarbageCollector.removeView(scopeView.getValue());
+                                        for (Map.Entry<ExtensionFactory, ScopeFactory> scopeFactoryEntry : scopesFactories.entrySet()) {
+                                            ScopeFactory scopeFactory = scopeFactoryEntry.getValue();
+                                            if (scopeFactory.getInstance() != null) {
+                                                scopeFactory.getInstance().stop();
+                                                scopeFactory.setInstance(null);
+                                            }
                                         }
+                                        nbScopesToBound = 0;
+                                        progressIndicator.setValue(Float.valueOf(0));
+                                        getSession().setAttribute("is.logged", false);
                                         buildLoginView(true);
                                     }
                                 });
@@ -388,36 +433,31 @@ public class BaseUI extends UI {
                 setExpandRatio(content, 1);
             }
 
-        });
+        };
+        nav = new Navigator(this, content);
 
         menu.removeAllComponents();
 
-        // Add Menu buttons
-        for(final Map.Entry<String, IScopeFactory> scope : scopes.entrySet()) {
-            if (showScope(scope.getValue())) {
-                addScopeButtonInMenu(scope.getValue(), false);
+        // Tell scopesFactories view factories to create views
+        for (Map.Entry<ExtensionFactory, ScopeFactory> scopeFactoryEntry : scopesFactories.entrySet()) {
+            if (isAllowedToShowScope(scopeFactoryEntry.getValue().getRoles())) {
+                ExtensionFactory extensionFactory = scopeFactoryEntry.getKey();
+                ScopeFactory scopeFactory = scopeFactoryEntry.getValue();
+                scopeFactory.setInstance(extensionFactory.create(new BaseUIContext(securityManager, uiId)));
+                nbScopesToBound++;
             }
         }
+
+        // Start progress indicator
+        root.removeAllComponents();
+        progressIndicatorLayout = new VerticalLayout();
+        progressIndicatorLayout.setSizeFull();
+        progressIndicatorLayout.addStyleName("login-layout");
+        root.addComponent(progressIndicatorLayout);
+        buildProgressIndicatorView();
 
         menu.addStyleName("menu");
         menu.setHeight("100%");
-
-        String f = Page.getCurrent().getUriFragment();
-        if (f != null && f.startsWith("!")) {
-            f = f.substring(1);
-        }
-        if (f == null || f.equals("") || f.equals("/")) {
-            nav.navigateTo("/home");
-            viewNameToMenuButton.get("/home").addStyleName("selected");
-        } else {
-            try {
-                nav.navigateTo(f);
-                viewNameToMenuButton.get(f).addStyleName("selected");
-            } catch (Exception e) {
-                nav.addView(f, new ScopeNavView(new ExceptionView(e)));
-                nav.navigateTo(f);
-            }
-        }
 
         nav.addViewChangeListener(new ViewChangeListener() {
 
@@ -431,6 +471,69 @@ public class BaseUI extends UI {
             public void afterViewChange(ViewChangeEvent event) {
             }
         });
+    }
+
+    private void buildProgressIndicatorView() {
+
+        final CssLayout progressPanel = new CssLayout();
+        progressPanel.addStyleName("login-panel");
+
+        HorizontalLayout labels = new HorizontalLayout();
+        labels.setWidth("100%");
+        labels.setMargin(true);
+        progressPanel.addComponent(labels);
+
+        Label welcome = new Label("Welcome " + securityManager.getUserName());
+        welcome.addStyleName("h4");
+        labels.addComponent(welcome);
+        labels.setComponentAlignment(welcome, Alignment.MIDDLE_LEFT);
+
+        Label title = new Label(consoleName);
+        title.addStyleName("h2");
+        title.addStyleName("light");
+        labels.addComponent(title);
+        labels.setComponentAlignment(title, Alignment.MIDDLE_RIGHT);
+
+        int scopesViewsBound = scopes.size();
+        final Float stopValue = new Float(1.0);
+
+        if (scopesFactories.isEmpty()) {
+            progressIndicator.setValue(stopValue);
+        } else {
+            progressIndicator.setValue(Float.valueOf(scopesViewsBound / nbScopesToBound));
+        }
+
+        if (stopValue.equals(progressIndicator.getValue())) {
+            showMainContent();
+        } else {
+//            TimeOutThread timeOutThread = new TimeOutThread();
+//            timeOutThread.start();
+            progressIndicator.setPollingInterval(500);
+            progressIndicator.addValueChangeListener(new Property.ValueChangeListener() {
+                @Override
+                public void valueChange(Property.ValueChangeEvent event) {
+                    if (stopValue.equals(event.getProperty().getValue())) {
+                        showMainContent();
+                    }
+                }
+            });
+        }
+
+        HorizontalLayout progressBarPanel = new HorizontalLayout();
+        progressBarPanel.setWidth("100%");
+        progressBarPanel.setMargin(true);
+        progressBarPanel.addComponent(progressIndicator);
+        progressBarPanel.setComponentAlignment(progressIndicator, Alignment.MIDDLE_CENTER);
+        progressPanel.addComponent(progressBarPanel);
+
+        progressIndicatorLayout.addComponent(progressPanel);
+        progressIndicatorLayout.setComponentAlignment(progressPanel, Alignment.MIDDLE_CENTER);
+    }
+
+    protected void showMainContent() {
+        removeStyleName("login");
+        root.removeAllComponents();
+        root.addComponent(main);
     }
 
     /**
@@ -467,105 +570,119 @@ public class BaseUI extends UI {
     }
 
     /**
-     * Build navigator routes to scopes views
-     */
-    private void buildRoutes() {
-        nav = new Navigator(this, content);
-        // Build routes
-        for (Map.Entry<String, IScopeFactory> scope : scopes.entrySet()) {
-            if (showScope(scope.getValue())) {
-                addRouteToNav(scope.getValue());
-            }
-        }
-    }
-
-    /**
      * Add route for scope view to navigator
-     * @param scope
+     * @param scopeView
      */
-    private void addRouteToNav(IScopeFactory scope) {
+    private void addRouteToNav(String scopeName, Component scopeView) {
         if (nav != null) {
+            nav.removeView("/" + scopeName);
+
+            View view;
             try {
-                nav.removeView("/" + scope.getSymbolicName());
-                try {
-                    scopesViews.put(scope.getSymbolicName(), scope.getView(new BaseUIContext(securityManager)));
-                } catch (Exception e) {
-                    scopesViews.put(scope.getSymbolicName(), new ExceptionView(e));
-                }
-                View view = new ScopeNavView(scopesViews.get(scope.getSymbolicName()));
-                nav.addView("/" + scope.getSymbolicName(), view);
-                // If is home scope
-                // attach the view to empty and "/" routes
-                if (HomeScope.SCOPE_NAME.equals(scope.getSymbolicName())) {
-                    nav.addView("", view);
-                    nav.addView("/", view);
-                }
+                view = new NavigatorView(scopeView);
             } catch (Exception e) {
-                e.printStackTrace();
+                view = new NavigatorView(new ExceptionView(e));
+            }
+            nav.addView("/" + scopeName, view);
+
+            // TODO change 'test' by 'home' when home scope one is available
+            if ("test".equals(scopeName.toLowerCase())) {
+                nav.addView("", view);
+                nav.addView("/", view);
             }
         }
     }
 
     /**
      * Remove route for scope view from navigator
-     * @param scope
+     * @param scopeName
      */
-    private void removeRouteFromNav(IScopeFactory scope) {
+    private void removeRouteFromNav(String scopeName) {
         if (nav != null) {
-            nav.removeView("/" + scope.getSymbolicName());
+            nav.removeView("/" + scopeName);
+            if (HomeScopeViewFactory.SCOPE_NAME.equals(scopeName)) {
+                nav.removeView("");
+                nav.removeView("/");
+            }
         }
     }
 
     /**
      * Add scope button in menu
-     * @param scope
+     * @param scopeName
      * @param notify for notifierService to show badge
      */
-    private void addScopeButtonInMenu(final IScopeFactory scope, boolean notify) {
+    private void addScopeButtonInMenu(final String scopeName, final Component scopeView, boolean notify) {
+        if (menu != null) {
+            final Button b = new NativeButton(scopeName.toUpperCase());
 
-        if (!uiIsBuilt) {
-            return;
-        }
+            b.addStyleName("icon-dashboard");
 
-        final Button b = new NativeButton(scope.getSymbolicName().toUpperCase());
+            b.addClickListener(new Button.ClickListener() {
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    clearMenuSelection();
+                    notifierService.removeBadge(scopeView);
+                    event.getButton().addStyleName("selected");
+                    nav.navigateTo("/" + scopeName);
+                }
+            });
 
-        b.addStyleName(scope.getStyle());
+            access(new Runnable() {
+                @Override
+                public void run() {
+                    menu.addComponent(b);
+                }
+            });
 
-        b.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                clearMenuSelection();
-                notifierService.removeBadge(scopesViews.get(scope.getSymbolicName()));
-                event.getButton().addStyleName("selected");
-                if (!nav.getState().equals("/" + scope.getSymbolicName()))
-                    nav.navigateTo("/" + scope.getSymbolicName());
+            notifierService.addScopeButton(scopeView, b, notify);
+
+            scopes.get(scopeName).setScopeMenuButton(b);
+
+            if (nbScopesToBound > 0) {
+                Float progressIndicatorValue = progressIndicator.getValue();
+                progressIndicatorValue += (float) (1.0 / nbScopesToBound);
+                progressIndicator.setValue(progressIndicatorValue);
             }
-        });
-        menu.getUI().getSession().getLockInstance().lock();
-        try {
-            menu.addComponent(b);
-        } finally {
-            menu.getUI().getSession().getLockInstance().unlock();
         }
-
-        notifierService.addScopeButton(scopesViews.get(scope.getSymbolicName()), b, notify);
-
-        viewNameToMenuButton.put("/" + scope.getSymbolicName(), b);
     }
 
     /**
      * Remove scope button from menu
-     * @param scope
+     * @param scopeName
      */
-    private void removeScopeButtonInMenu(IScopeFactory scope) {
-        if (viewNameToMenuButton.containsKey("/" + scope.getSymbolicName())) {
-            menu.removeComponent(viewNameToMenuButton.get("/" + scope.getSymbolicName()));
-            viewNameToMenuButton.remove("/" + scope.getSymbolicName());
-            notifierService.removeScopeButton(scopesViews.get(scope.getSymbolicName()));
+    private void removeScopeButtonInMenu(final String scopeName) {
+        if (scopes.get(scopeName).getScopeMenuButton() != null) {
+            access(new Runnable() {
+                @Override
+                public void run() {
+                    menu.removeComponent(scopes.get(scopeName).getScopeMenuButton());
+                }
+            });
+            scopes.get(scopeName).setScopeMenuButton(null);
+            notifierService.removeScopeButton((Component) scopes.get(scopeName).getScopeView());
         }
     }
 
-    private boolean showScope(IScopeFactory scopeFactory) {
-        return securityManager.isUserInRoles(scopeFactory.getAllowedRoles());
+    private boolean isAllowedToShowScope(String[] rolesAllowed) {
+        return securityManager.isUserInRoles(rolesAllowed);
+    }
+
+    public class TimeOutThread extends Thread {
+
+        @Override
+        public void run() {
+            try {
+                sleep(3000);
+                if (progressIndicator.getValue() < 1) {
+                    access(new Runnable() {
+                        @Override
+                        public void run() {
+                            showMainContent();
+                        }
+                    });
+                }
+            } catch (InterruptedException e) {}
+        }
     }
 }
