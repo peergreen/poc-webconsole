@@ -21,7 +21,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.ipojo</artifactId>
+      <artifactId>org.apache.felix.ipojo.annotations</artifactId>
       <version>${ipojo.version}</version>
       <scope>provided</scope>
     </dependency>
