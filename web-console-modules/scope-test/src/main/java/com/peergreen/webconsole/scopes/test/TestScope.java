@@ -1,56 +1,50 @@
 package com.peergreen.webconsole.scopes.test;
 
-import com.peergreen.webconsole.scope.IScopeFactory;
-import com.peergreen.webconsole.scope.IScopeTabsFactory;
-import com.peergreen.webconsole.UIContext;
-import org.apache.felix.ipojo.annotations.Component;
-import org.apache.felix.ipojo.annotations.Instantiate;
-import org.apache.felix.ipojo.annotations.Provides;
-import org.apache.felix.ipojo.annotations.Requires;
+import com.peergreen.webconsole.Extension;
+import com.peergreen.webconsole.ExtensionPoint;
+import com.peergreen.webconsole.INotifierService;
+import com.peergreen.webconsole.Inject;
+import com.peergreen.webconsole.Link;
+import com.peergreen.webconsole.Ready;
+import com.peergreen.webconsole.Scope;
+import com.peergreen.webconsole.Unlink;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.TabSheet;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Dictionary;
 
 /**
- * Created with IntelliJ IDEA.
- * User: mohammed
- * Date: 19/05/13
- * Time: 15:53
- * To change this template use File | Settings | File Templates.
+ * @author Mohammed Boukada
  */
-@Component
-@Instantiate
-@Provides
-public class TestScope implements IScopeFactory {
+@Extension
+@ExtensionPoint("com.peergreen.webconsole.pgadmin.scope")
+@Scope(name = "test")
+public class TestScope extends TabSheet {
 
-    final static String SCOPE_NAME = "web";
+    @Inject
+    INotifierService notifierService;
 
-    final static String STYLE = "icon-sales";
-
-    private List<String> allowedRoles = new ArrayList<String>() {{
-        add("platform-admin");
-    }};
-
-    @Requires
-    IScopeTabsFactory scopeTabsFactory;
-
-    @Override
-    public String getSymbolicName() {
-        return SCOPE_NAME;
+    @Ready
+    public void buildComponent() {
+        setSizeFull();
+        setCloseHandler(new TabSheet.CloseHandler() {
+            @Override
+            public void onTabClose(TabSheet tabsheet, com.vaadin.ui.Component tabContent) {
+                notifierService.addNotification("Warning ! You have closed " +
+                        tabsheet.getTab(tabContent).getCaption() + " module");
+                tabsheet.removeComponent(tabContent);
+            }
+        });
     }
 
-    @Override
-    public List<String> getAllowedRoles() {
-        return allowedRoles;
+    @Link("tab")
+    public void addTabs(Component tab, Dictionary properties) {
+        tab.setSizeFull();
+        addTab(tab, (String) properties.get("extension.name")).setClosable(true);
     }
 
-    @Override
-    public com.vaadin.ui.Component getView(UIContext context) {
-        return scopeTabsFactory.createInstance(SCOPE_NAME, context);
-    }
-
-    @Override
-    public String getStyle() {
-        return STYLE;
+    @Unlink("tab")
+    public void removeTabs(Component tab) {
+        removeComponent(tab);
     }
 }
