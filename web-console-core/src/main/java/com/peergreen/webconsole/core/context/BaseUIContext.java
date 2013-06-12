@@ -4,22 +4,25 @@ import com.peergreen.webconsole.ISecurityManager;
 import com.peergreen.webconsole.UIContext;
 
 /**
- * Created with IntelliJ IDEA.
- * User: mohammed
- * Date: 28/05/13
- * Time: 15:56
- * To change this template use File | Settings | File Templates.
+ * @author Mohammed Boukada
  */
 public class BaseUIContext implements UIContext {
 
     private ISecurityManager securityManager;
+    private int uiId;
 
-    public BaseUIContext(ISecurityManager securityManager) {
+    public BaseUIContext(ISecurityManager securityManager, int uiId) {
         this.securityManager = securityManager;
+        this.uiId = uiId;
     }
 
     @Override
     public ISecurityManager getSecurityManager() {
         return securityManager;
+    }
+
+    @Override
+    public int getUIId() {
+        return uiId;
     }
 }

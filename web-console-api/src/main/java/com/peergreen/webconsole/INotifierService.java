@@ -1,6 +1,5 @@
 package com.peergreen.webconsole;
 
-import com.peergreen.webconsole.NotificationOverlay;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 

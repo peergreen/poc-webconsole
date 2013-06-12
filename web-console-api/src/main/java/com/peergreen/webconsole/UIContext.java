@@ -11,4 +11,5 @@ public interface UIContext {
 
     ISecurityManager getSecurityManager();
 
+    int getUIId();
 }
