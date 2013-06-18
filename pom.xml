@@ -24,7 +24,7 @@
   </modules>
 
   <properties>
-    <ipojo.version>1.10.1-SNAPSHOT</ipojo.version>
+    <ipojo.version>1.10.1</ipojo.version>
     <vaadin.version>7.1.0.beta1</vaadin.version>
     <peergreen.newsfeed.version>1.0.1-SNAPSHOT</peergreen.newsfeed.version>
   </properties>
@@ -66,39 +66,24 @@
   </build>
 
   <repositories>
-    <!-- TODO remove when annotations module will be released -->
     <repository>
-      <id>apache.snapshots</id>
-      <releases><enabled>false</enabled></releases>
-      <url>https://repository.apache.org/content/groups/snapshots/</url>
+      <!-- TODO remove when iPOJO 1.10.1 will be promoted -->
+      <id>apache-felix-ipojo</id>
+      <name>Apache Felix iPOJO Staging Repository</name>
+      <url>https://repository.apache.org/content/repositories/orgapachefelix-021/</url>
+      <snapshots><enabled>false</enabled></snapshots>
     </repository>
   </repositories>
 
   <pluginRepositories>
     <pluginRepository>
-      <id>apache-snapshots-plugin</id>
-      <url>https://repository.apache.org/content/repositories/orgapachefelix-024/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
+      <!-- TODO remove when iPOJO 1.10.1 will be promoted -->
+      <id>apache-felix-ipojo-plugin</id>
+      <name>Apache Felix iPOJO Staging Repository</name>
+      <url>https://repository.apache.org/content/repositories/orgapachefelix-021/</url>
+      <snapshots><enabled>false</enabled></snapshots>
     </pluginRepository>
   </pluginRepositories>
-
-  <!--<repositories>
-    <repository>
-      <id>vaadin-snapshots</id>
-      <url>http://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories>-->
 
 
 </project>
