@@ -1,5 +1,6 @@
 package com.peergreen.webconsole.core.vaadin7;
 
+import com.peergreen.webconsole.Constants;
 import com.peergreen.webconsole.IConsole;
 import com.vaadin.server.UIClassSelectionEvent;
 import com.vaadin.server.UICreateEvent;
@@ -14,10 +15,9 @@ import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Provides;
 import org.apache.felix.ipojo.annotations.Requires;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
 
-import java.util.Properties;
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 /**
  * Vaadin Base console UI provider
@@ -42,6 +42,8 @@ public class UIProviderBase extends UIProvider {
      * Bundle context
      */
     private BundleContext bundleContext;
+
+    private int uiId = 0;
 
     /**
      * Vaadin base UI provider constructor
@@ -71,33 +73,28 @@ public class UIProviderBase extends UIProvider {
     @Override
     public UI createInstance(final UICreateEvent e) {
 
-        UI ui = null;
+        BaseUI ui = null;
         try {
             // Create an instance of baseUI
-            BaseUI newUi = new BaseUI(console.getConsoleName());
+            String scopeExtensionPoint = "com.peergreen.webconsole." + console.getConsoleAlias().substring(1) + ".scope";
+            ui = new BaseUI(console.getConsoleName(), scopeExtensionPoint, uiId);
 
             // Configuration properties for ipojo component
-            Properties props = new Properties();
-            // Use the instance of baseUI an pojo instance for ipojo component
-            props.put("instance.object", newUi);
+            Dictionary<String, Object> props = new Hashtable<>();
+            props.put("instance.object", ui);
+            Dictionary<String, Object> bindFilters = new Hashtable<>();
+            bindFilters.put("ScopeView", "(&(" + Constants.UI_ID + "=" + uiId + ")(" +
+                    Constants.EXTENSION_POINT + "=" + scopeExtensionPoint + "))");
+            props.put(Constants.REQUIRES_FILTER, bindFilters);
 
             // Create ipojo component from its factory
             ComponentInstance instance = factory.createComponentInstance(props);
-
-            // Retrieve service from service reference
-            ServiceReference[] refs = bundleContext.getServiceReferences(BaseUI.class.getName(),
-                            "(instance.name=" + instance.getInstanceName() +")");
-            if (refs != null) {
-                // Gets the created UI as an ipojo component
-                ui = (UI) bundleContext.getService(refs[0]);
-            }
+            uiId++;
         } catch (UnacceptableConfiguration unacceptableConfiguration) {
             unacceptableConfiguration.printStackTrace();
         } catch (MissingHandlerException ex) {
             ex.printStackTrace();
         } catch (ConfigurationException ex) {
-            ex.printStackTrace();
-        } catch (InvalidSyntaxException ex) {
             ex.printStackTrace();
         }
 

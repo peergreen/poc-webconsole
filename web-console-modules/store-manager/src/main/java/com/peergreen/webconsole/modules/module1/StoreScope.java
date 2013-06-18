@@ -1,8 +1,8 @@
-package com.peergreen.webconsole.scopes.test;
+package com.peergreen.webconsole.modules.module1;
 
 import com.peergreen.webconsole.Extension;
 import com.peergreen.webconsole.ExtensionPoint;
-import com.peergreen.webconsole.INotifierService;
+import com.peergreen.webconsole.ISecurityManager;
 import com.peergreen.webconsole.Inject;
 import com.peergreen.webconsole.Link;
 import com.peergreen.webconsole.Ready;
@@ -11,6 +11,7 @@ import com.peergreen.webconsole.Unlink;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.TabSheet;
 
+import javax.annotation.security.RolesAllowed;
 import java.util.Dictionary;
 
 /**
@@ -18,29 +19,23 @@ import java.util.Dictionary;
  */
 @Extension
 @ExtensionPoint("com.peergreen.webconsole.pgadmin.scope")
-@Scope(name = "test")
-public class TestScope extends TabSheet {
+@RolesAllowed("superadmin")
+@Scope(name = "Store")
+public class StoreScope extends TabSheet {
 
     @Inject
-    INotifierService notifierService;
+    ISecurityManager securityManager;
 
     @Ready
-    public void buildComponent() {
+    public void createView() {
         setSizeFull();
-        setCloseHandler(new TabSheet.CloseHandler() {
-            @Override
-            public void onTabClose(TabSheet tabsheet, com.vaadin.ui.Component tabContent) {
-                notifierService.addNotification("Warning ! You have closed " +
-                        tabsheet.getTab(tabContent).getCaption() + " module");
-                tabsheet.removeComponent(tabContent);
-            }
-        });
+        securityManager.getUserName();
     }
 
     @Link("tab")
     public void addTabs(Component tab, Dictionary properties) {
         tab.setSizeFull();
-        addTab(tab, (String) properties.get("extension.name")).setClosable(true);
+        addTab(tab, (String) properties.get("tab.name"));
     }
 
     @Unlink("tab")

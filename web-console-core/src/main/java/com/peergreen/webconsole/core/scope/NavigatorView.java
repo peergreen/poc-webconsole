@@ -9,9 +9,9 @@ import com.vaadin.ui.CssLayout;
  * Build a scope view for Navigator
  * @author Mohammed Boukada
  */
-public class ScopeNavView extends CssLayout implements View {
+public class NavigatorView extends CssLayout implements View {
 
-    public ScopeNavView(Component component) {
+    public NavigatorView(Component component) {
         setSizeFull();
         addComponent(component);
     }

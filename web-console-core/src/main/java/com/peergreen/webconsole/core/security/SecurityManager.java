@@ -11,11 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Created with IntelliJ IDEA.
- * User: mohammed
- * Date: 27/05/13
- * Time: 16:40
- * To change this template use File | Settings | File Templates.
+ * @author Mohammed Boukada
  */
 public class SecurityManager implements ISecurityManager {
 
@@ -48,13 +44,13 @@ public class SecurityManager implements ISecurityManager {
     }
 
     @Override
-    public boolean isUserInRoles(List<String> roles) {
+    public boolean isUserInRoles(String[] roles) {
         for (String role : roles) {
             if ("all".equals(role.toLowerCase()) || principalRoles.contains(role)) {
                 return true;
             }
         }
-        return false;
+        return roles.length == 0;
     }
 
     @Override

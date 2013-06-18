@@ -1,13 +1,10 @@
 package com.peergreen.webconsole.modules.module1;
 
-import com.peergreen.webconsole.module.IModuleFactory;
+import com.peergreen.webconsole.Extension;
+import com.peergreen.webconsole.ExtensionPoint;
+import com.peergreen.webconsole.Ready;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
-import org.apache.felix.ipojo.annotations.Instantiate;
-import org.apache.felix.ipojo.annotations.Provides;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,38 +13,15 @@ import java.util.List;
  * Time: 13:43
  * To change this template use File | Settings | File Templates.
  */
-@org.apache.felix.ipojo.annotations.Component
-@Provides
-@Instantiate
-public class Module1 implements IModuleFactory {
+@Extension
+@ExtensionPoint("com.peergreen.webconsole.modules.module1.StoreScope.tab")
+public class Module1 extends CssLayout {
 
-    private List<String> allowedRoles = new ArrayList<String>() {{
-        add("all");
-    }};
-
-    @Override
-    public com.vaadin.ui.Component getView() {
-        CssLayout component = new CssLayout();
-        component.addStyleName("timeline");
-
+    @Ready
+    public void createView() {
+        addStyleName("timeline");
         Label header = new Label("This is a view contribution ! ");
         header.addStyleName("h1");
-        component.addComponent(header);
-        return component;
-    }
-
-    @Override
-    public String getScope() {
-        return "store";
-    }
-
-    @Override
-    public String getName() {
-        return "Store Manager";
-    }
-
-    @Override
-    public List<String> getAllowedRoles() {
-        return allowedRoles;
+        addComponent(header);
     }
 }

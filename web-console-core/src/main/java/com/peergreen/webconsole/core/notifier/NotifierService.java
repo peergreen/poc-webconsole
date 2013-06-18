@@ -104,6 +104,7 @@ public class NotifierService implements INotifierService {
     }
 
     /** {@inheritDoc}
+     * @param scope
      */
     public void removeBadge(com.vaadin.ui.Component scope) {
         updateBadge(scope, 0);

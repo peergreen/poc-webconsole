@@ -1,20 +1,17 @@
 package com.peergreen.webconsole.modules.bundles;
 
-import com.peergreen.webconsole.module.IModuleFactory;
-import org.apache.felix.ipojo.annotations.Instantiate;
-import org.apache.felix.ipojo.annotations.Provides;
+import com.peergreen.webconsole.Extension;
+import com.peergreen.webconsole.ExtensionPoint;
+import com.peergreen.webconsole.Inject;
+import com.peergreen.webconsole.Ready;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -23,26 +20,18 @@ import java.util.List;
  * Time: 13:43
  * To change this template use File | Settings | File Templates.
  */
-@org.apache.felix.ipojo.annotations.Component
-@Provides
-@Instantiate
-public class BundlesModule implements IModuleFactory {
+@Extension
+@ExtensionPoint("com.peergreen.webconsole.scopes.test.TestScope.tab")
+public class BundlesModule extends VerticalLayout {
 
-    private final BundleContext bundleContext;
+    @Inject
+    private BundleContext bundleContext;
     private Table table;
-    private List<String> allowedRoles = new ArrayList<String>() {{
-        add("platform-admin");
-    }};
 
-    public BundlesModule(final BundleContext bundleContext) {
-        this.bundleContext = bundleContext;
-    }
-
-    @Override
-    public Component getView() {
-        VerticalLayout verticalLayout = new VerticalLayout();
-        verticalLayout.setMargin(true);
-        verticalLayout.setSpacing(true);
+    @Ready
+    public void createView() {
+        setMargin(true);
+        setSpacing(true);
 
         table = new Table();
         table.addContainerProperty("Bundle Symbolic Name", String.class, null);
@@ -56,9 +45,7 @@ public class BundlesModule implements IModuleFactory {
         table.setImmediate(true);
 
         refreshTable();
-        verticalLayout.addComponent(table);
-
-        return verticalLayout;
+        addComponent(table);
     }
 
     private void refreshTable() {
@@ -119,20 +106,5 @@ public class BundlesModule implements IModuleFactory {
             default:
                 return "UNKNOWN";
         }
-    }
-
-    @Override
-    public String getScope() {
-        return "osgi";
-    }
-
-    @Override
-    public String getName() {
-        return "Bundles";
-    }
-
-    @Override
-    public List<String> getAllowedRoles() {
-        return allowedRoles;
     }
 }

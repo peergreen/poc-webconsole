@@ -1,15 +1,11 @@
 package com.peergreen.webconsole.modules.web;
 
-import com.peergreen.webconsole.module.IModuleFactory;
+import com.peergreen.webconsole.Extension;
+import com.peergreen.webconsole.ExtensionPoint;
+import com.peergreen.webconsole.Ready;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.ui.BrowserFrame;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
-import org.apache.felix.ipojo.annotations.Instantiate;
-import org.apache.felix.ipojo.annotations.Provides;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,40 +14,19 @@ import java.util.List;
  * Time: 11:16
  * To change this template use File | Settings | File Templates.
  */
-@org.apache.felix.ipojo.annotations.Component
-@Provides
-@Instantiate
-public class PeergreenDocumentation implements IModuleFactory {
 
-    private List<String> allowedRoles = new ArrayList<String>() {{
-        add("all");
-    }};
+@Extension
+@ExtensionPoint("com.peergreen.webconsole.scopes.test.TestScope.tab")
+public class PeergreenDocumentation extends VerticalLayout {
 
-    @Override
-    public Component getView() {
-        VerticalLayout verticalLayout = new VerticalLayout();
-        verticalLayout.setMargin(true);
-        verticalLayout.setSpacing(true);
+    @Ready
+    public void createView() {
+        setMargin(true);
+        setSpacing(true);
         BrowserFrame browser = new BrowserFrame("",
                 new ExternalResource("http://docs.peergreen.com/peergreen_server/latest/reference/xhtml-single/user-guide.xhtml"));
         browser.setSizeFull();
-        verticalLayout.addComponent(browser);
-        verticalLayout.setExpandRatio(browser, 1.5f);
-        return verticalLayout;
-    }
-
-    @Override
-    public String getScope() {
-        return "web";
-    }
-
-    @Override
-    public String getName() {
-        return "Peergreen Documentation";
-    }
-
-    @Override
-    public List<String> getAllowedRoles() {
-        return allowedRoles;
+        addComponent(browser);
+        setExpandRatio(browser, 1.5f);
     }
 }
