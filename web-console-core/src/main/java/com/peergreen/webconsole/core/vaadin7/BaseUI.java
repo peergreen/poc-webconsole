@@ -163,7 +163,7 @@ public class BaseUI extends UI {
             scopesFactories.remove(extensionFactory);
             ScopeFactory scopeFactory = new ScopeFactory(roles);
             if (progressIndicator.getValue() >= 1) {
-                scopeFactory.setInstance(extensionFactory.create(new BaseUIContext(securityManager, uiId)));
+                scopeFactory.setInstance(extensionFactory.create(new BaseUIContext(this, securityManager, uiId)));
             }
             scopesFactories.put(extensionFactory, scopeFactory);
         }
@@ -444,7 +444,7 @@ public class BaseUI extends UI {
             if (isAllowedToShowScope(scopeFactoryEntry.getValue().getRoles())) {
                 ExtensionFactory extensionFactory = scopeFactoryEntry.getKey();
                 ScopeFactory scopeFactory = scopeFactoryEntry.getValue();
-                scopeFactory.setInstance(extensionFactory.create(new BaseUIContext(securityManager, uiId)));
+                scopeFactory.setInstance(extensionFactory.create(new BaseUIContext(this, securityManager, uiId)));
                 nbScopesToBound++;
             }
         }

@@ -20,6 +20,8 @@ import org.apache.felix.ipojo.annotations.Unbind;
 import org.apache.felix.ipojo.architecture.ComponentTypeDescription;
 import org.apache.felix.ipojo.architecture.HandlerDescription;
 import org.apache.felix.ipojo.architecture.PropertyDescription;
+import org.apache.felix.ipojo.handlers.dependency.Dependency;
+import org.apache.felix.ipojo.handlers.dependency.DependencyCallback;
 import org.apache.felix.ipojo.handlers.dependency.DependencyHandler;
 import org.apache.felix.ipojo.metadata.Attribute;
 import org.apache.felix.ipojo.metadata.Element;
@@ -340,6 +342,11 @@ public class ExtensionHandler extends DependencyHandler {
                 }
             }
         }
+    }
+
+    @Override
+    protected DependencyCallback createDependencyHandler(Dependency dep, String method, int type) {
+        return new LinkDependencyCallback(dep, method, type, uiContext.getUI());
     }
 
     public static interface InstanceManager {

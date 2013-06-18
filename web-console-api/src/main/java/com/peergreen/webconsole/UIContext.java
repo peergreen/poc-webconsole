@@ -1,5 +1,7 @@
 package com.peergreen.webconsole;
 
+import com.vaadin.ui.UI;
+
 /**
  * Created with IntelliJ IDEA.
  * User: mohammed
@@ -10,6 +12,8 @@ package com.peergreen.webconsole;
 public interface UIContext {
 
     ISecurityManager getSecurityManager();
+
+    UI getUI();
 
     int getUIId();
 }
