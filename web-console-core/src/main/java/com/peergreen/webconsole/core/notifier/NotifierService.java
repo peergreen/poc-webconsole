@@ -109,7 +109,7 @@ public class NotifierService implements INotifierService {
     public void removeBadge(com.vaadin.ui.Component scope) {
         updateBadge(scope, 0);
         scopesButtons.get(scope).setHtmlContentAllowed(true);
-        scopesButtons.get(scope).setCaption(getInitialCaption(scopesButtons.get(scope)));
+        setCaption(scopesButtons.get(scope), getInitialCaption(scopesButtons.get(scope)));
     }
 
     /** {@inheritDoc}
@@ -121,7 +121,7 @@ public class NotifierService implements INotifierService {
             scopesButtons.get(scope).setHtmlContentAllowed(true);
             String newCaption = getInitialCaption(scopesButtons.get(scope)) +
                     "<span class=\"badge\">" + badges.get(scope) +"</span>";
-            scopesButtons.get(scope).setCaption(newCaption);
+            setCaption(scopesButtons.get(scope), newCaption);
         }
     }
 
@@ -133,7 +133,7 @@ public class NotifierService implements INotifierService {
             scopesButtons.get(scope).setHtmlContentAllowed(true);
             String newCaption = getInitialCaption(scopesButtons.get(scope)) +
                     ((badges.get(scope) == 0) ? "" : "<span class=\"badge\">" + badges.get(scope) +"</span>");
-            scopesButtons.get(scope).setCaption(newCaption);
+            setCaption(scopesButtons.get(scope), newCaption);
         }
     }
 
@@ -141,11 +141,21 @@ public class NotifierService implements INotifierService {
      * Set badge as new
      * @param button
      */
-    private void setBadgeAsNew(Button button) {
+    private void setBadgeAsNew(final Button button) {
         button.setHtmlContentAllowed(true);
-        String newCaption = getInitialCaption(button) +
+        final String newCaption = getInitialCaption(button) +
                 "<span class=\"badge\">new</span>";
-        button.setCaption(newCaption);
+        setCaption(button, newCaption);
+
+    }
+
+    private void setCaption(final Button button, final String caption) {
+        button.getUI().access(new Runnable() {
+            @Override
+            public void run() {
+                button.setCaption(caption);
+            }
+        });
     }
 
     /**
