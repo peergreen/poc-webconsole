@@ -40,7 +40,7 @@ public class TestScope extends TabSheet {
     @Link("tab")
     public void addTabs(Component tab, Dictionary properties) {
         tab.setSizeFull();
-        addTab(tab, (String) properties.get("extension.name")).setClosable(true);
+        addTab(tab, (String) properties.get("tab.name")).setClosable(true);
     }
 
     @Unlink("tab")

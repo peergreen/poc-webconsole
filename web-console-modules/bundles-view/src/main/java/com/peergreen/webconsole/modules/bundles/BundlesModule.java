@@ -4,6 +4,7 @@ import com.peergreen.webconsole.Extension;
 import com.peergreen.webconsole.ExtensionPoint;
 import com.peergreen.webconsole.Inject;
 import com.peergreen.webconsole.Ready;
+import com.peergreen.webconsole.scopes.test.Tab;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -22,6 +23,7 @@ import com.vaadin.ui.VerticalLayout;
  */
 @Extension
 @ExtensionPoint("com.peergreen.webconsole.scopes.test.TestScope.tab")
+@Tab(name = "OSGi Bundles")
 public class BundlesModule extends VerticalLayout {
 
     @Inject

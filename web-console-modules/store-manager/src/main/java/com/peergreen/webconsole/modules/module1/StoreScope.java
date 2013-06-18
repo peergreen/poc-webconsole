@@ -19,7 +19,6 @@ import java.util.Dictionary;
  */
 @Extension
 @ExtensionPoint("com.peergreen.webconsole.pgadmin.scope")
-@RolesAllowed("superadmin")
 @Scope(name = "Store")
 public class StoreScope extends TabSheet {
 

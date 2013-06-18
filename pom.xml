@@ -87,7 +87,7 @@
     </pluginRepository>
   </pluginRepositories>
 
-  <repositories>
+  <!--<repositories>
     <repository>
       <id>vaadin-snapshots</id>
       <url>http://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
@@ -98,7 +98,7 @@
         <enabled>true</enabled>
       </snapshots>
     </repository>
-  </repositories>
+  </repositories>-->
 
 
 </project>

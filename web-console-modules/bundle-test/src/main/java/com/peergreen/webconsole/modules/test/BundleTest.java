@@ -2,6 +2,7 @@ package com.peergreen.webconsole.modules.test;
 
 import com.peergreen.webconsole.Extension;
 import com.peergreen.webconsole.ExtensionPoint;
+import com.peergreen.webconsole.scopes.test.Tab;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
 import org.apache.felix.ipojo.annotations.Validate;
@@ -15,6 +16,7 @@ import org.apache.felix.ipojo.annotations.Validate;
  */
 @Extension
 @ExtensionPoint("com.peergreen.webconsole.scopes.test.TestScope.tab")
+@Tab(name = "Bundle Test")
 public class BundleTest extends CssLayout {
 
     @Validate

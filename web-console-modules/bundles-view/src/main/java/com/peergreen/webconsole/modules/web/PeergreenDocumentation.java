@@ -3,6 +3,7 @@ package com.peergreen.webconsole.modules.web;
 import com.peergreen.webconsole.Extension;
 import com.peergreen.webconsole.ExtensionPoint;
 import com.peergreen.webconsole.Ready;
+import com.peergreen.webconsole.scopes.test.Tab;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.VerticalLayout;
@@ -17,6 +18,7 @@ import com.vaadin.ui.VerticalLayout;
 
 @Extension
 @ExtensionPoint("com.peergreen.webconsole.scopes.test.TestScope.tab")
+@Tab(name = "Peergreen Documentation")
 public class PeergreenDocumentation extends VerticalLayout {
 
     @Ready

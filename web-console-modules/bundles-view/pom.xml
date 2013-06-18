@@ -30,6 +30,12 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>com.peergreen.webconsole</groupId>
+      <artifactId>scope-test</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-server</artifactId>
       <version>${vaadin.version}</version>
