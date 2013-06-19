@@ -190,7 +190,7 @@ public class BaseUI extends UI {
 
     @Bind(aggregate = true, optional = true)
     public void bindScopeView(Component scopeView, Dictionary props) {
-        String scopeName = (String) props.get("scope.name");
+        String scopeName = (String) props.get("scope.value");
         Scope scope = new Scope(scopeName, scopeView);
         scopes.put(scopeName, scope);
         addRouteToNav(scopeName, scopeView);
@@ -199,7 +199,7 @@ public class BaseUI extends UI {
 
     @Unbind
     public void unbindScopeView(Component scopeView, Dictionary props) {
-        String scopeName = (String) props.get("scope.name");
+        String scopeName = (String) props.get("scope.value");
         removeRouteFromNav(scopeName);
         removeScopeButtonInMenu(scopeName);
         scopes.remove(scopeName);

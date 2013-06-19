@@ -12,6 +12,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Qualifier("scope")
 public @interface Scope {
-    String name();
+    String value();
     String iconPath() default "";
 }

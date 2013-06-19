@@ -159,8 +159,11 @@ public class ExtensionHandlerTestCase {
         extensionHandler.setExtensionType();
         Dictionary properties = extensionHandler.setExtensionProperties(new Hashtable());
 
-        Assert.assertTrue(properties.size() == 2, "Properties must contains 2 elements");
-        Assert.assertEquals(properties.get("test.name"), "My Awesome Extension", "Wrong name attribute in Qualifier annotation");
-        Assert.assertEquals(properties.get("test.iconPath"), "", "Wrong icon path attribute in Qualifier annotation");
+        Assert.assertTrue(properties.size() == 5, "Properties must contains 2 elements");
+        Assert.assertEquals(properties.get("test.attr1"), "My Awesome Extension", "Wrong attr1 attribute in Qualifier annotation");
+        Assert.assertEquals(properties.get("test.attr2"), "", "Wrong attr2 attribute in Qualifier annotation");
+        Assert.assertEquals(properties.get("test.attr3"), "Really an awesome extension", "Wrong attr3 attribute in Qualifier annotation");
+        Assert.assertEquals(properties.get("scope.value"), "testScopeAnnotationWithoutIconPath", "Wrong name attribute in Scope annotation");
+        Assert.assertEquals(properties.get("scope.iconPath"), "", "Wrong icon path attribute in Scope annotation");
     }
 }

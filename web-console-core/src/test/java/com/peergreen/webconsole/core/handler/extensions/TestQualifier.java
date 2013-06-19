@@ -14,6 +14,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Qualifier("test")
 public @interface TestQualifier {
-    String name();
-    String iconPath() default "";
+    String attr1();
+    String attr2() default "";
+    String attr3();
 }
