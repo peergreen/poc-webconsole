@@ -19,8 +19,10 @@
     <module>web-console-pgadmin</module>
     <module>web-console-api</module>
     <module>vaadin-all</module>
+<!--
     <module>poc-httpservice-push</module>
     <module>poc-httpservice-push-button</module>
+-->
   </modules>
 
   <properties>
