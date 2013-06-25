@@ -33,6 +33,9 @@ import java.util.Collections;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CheckCreateConsole {
 
+    private final static int NB_SESSIONS = 3;
+    private final static String WEB_CONSOLE_URL = "http://localhost:9000/pgadmin/";
+
     @Inject
     @Filter("(ipojo.queue.mode=async)")
     private QueueService queueService;
@@ -78,11 +81,14 @@ public class CheckCreateConsole {
                 bundleContext.getServiceReferences(Architecture.class, "(architecture.instance=com.peergreen.webconsole.core.vaadin7.UIProviderBase-0)");
         Assert.assertTrue("One UIProvider for one console", uiProvider.size() == 1);
 
-        helper.waitForWebConsoleStability("http://localhost:9000/pgadmin/");
-        helper.waitForIPOJOStability();
+        Collection<ServiceReference<Architecture>> baseui;
+        for (int i=0; i < NB_SESSIONS; i++) {
+            helper.waitForWebConsoleStability(WEB_CONSOLE_URL);
+            helper.waitForIPOJOStability();
 
-        Collection<ServiceReference<Architecture>> baseui =
-                bundleContext.getServiceReferences(Architecture.class, "(architecture.instance=com.peergreen.webconsole.core.vaadin7.BaseUI-0)");
-        Assert.assertTrue("Console UI component not created", baseui.size() == 1);
+            baseui = bundleContext.getServiceReferences(Architecture.class,
+                    "(architecture.instance=com.peergreen.webconsole.core.vaadin7.BaseUI-" + i + ")");
+            Assert.assertTrue("Console UI component for session " + i + " not created", baseui.size() == 1);
+        }
     }
 }

@@ -16,14 +16,9 @@ public class StabilityHelper {
     public static final int DEFAULT_TIMEOUT = THIRTY_SECONDS;
 
     private final QueueService queueService;
-    private final WebClient webClient;
 
     public StabilityHelper(final QueueService queueService) {
         this.queueService = queueService;
-        webClient = new WebClient();
-        webClient.getOptions().setThrowExceptionOnScriptError(false);
-        webClient.getOptions().setCssEnabled(true);
-        webClient.getOptions().setJavaScriptEnabled(true);
     }
 
     public void waitForIPOJOStability() throws Exception {
@@ -74,13 +69,22 @@ public class StabilityHelper {
             return queueService.getWaiters() == 0 && queueService.getFinished() > 0;
         } else {
             try {
-                webClient.getPage(url);
+                getNewWebClient().getPage(url);
                 Thread.sleep(3000);
                 return true;
             } catch (Exception e) {
                 return false;
             }
         }
+    }
+
+    private WebClient getNewWebClient() {
+        WebClient webClient = new WebClient();
+        webClient.getOptions().setThrowExceptionOnScriptError(false);
+        webClient.getOptions().setCssEnabled(true);
+        webClient.getOptions().setJavaScriptEnabled(true);
+
+        return webClient;
     }
 
 }
