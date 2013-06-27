@@ -1,3 +1,0 @@
-Export-Package VAADIN.*, com.peergreen.webconsole.*
-Private-Package com.peergreen.webconsole.*
-Import-Package javax.servlet; version="[2.5.0,3.0.0]",*
