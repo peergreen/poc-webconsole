@@ -101,8 +101,8 @@ public class UIProviderBase extends UIProvider {
             props.put(Constants.REQUIRES_FILTER, bindFilters);
 
             // Create ipojo component from its factory
-            ComponentInstance instance = factory.createComponentInstance(props);
-            uiId++;
+            uis.add(factory.createComponentInstance(props));
+            i++;
         } catch (UnacceptableConfiguration unacceptableConfiguration) {
             unacceptableConfiguration.printStackTrace();
         } catch (MissingHandlerException ex) {
@@ -112,5 +112,13 @@ public class UIProviderBase extends UIProvider {
         }
 
         return ui;
+    }
+
+    @Invalidate
+    public void stop() {
+        for (ComponentInstance instance : uis) {
+            instance.stop();
+            instance.dispose();
+        }
     }
 }

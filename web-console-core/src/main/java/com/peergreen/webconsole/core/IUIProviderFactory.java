@@ -1,7 +1,8 @@
 package com.peergreen.webconsole.core;
 
-import com.peergreen.webconsole.IConsole;
 import com.vaadin.server.UIProvider;
+
+import java.util.Dictionary;
 
 /**
  * Vaadin UI provider factory
@@ -11,8 +12,10 @@ public interface IUIProviderFactory {
 
     /**
      * Create an UI provider for a console
-     * @param console
+     * @param properties
      * @return
      */
-    UIProvider createUIProvider(IConsole console);
+    UIProvider createUIProvider(Dictionary properties);
+
+    void stopUIProvider(Dictionary properties);
 }

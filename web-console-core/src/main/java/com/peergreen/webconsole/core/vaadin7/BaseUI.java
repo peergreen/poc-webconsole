@@ -22,6 +22,7 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -38,7 +39,9 @@ import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.UIDetachedException;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.util.CurrentInstance;
 import org.apache.felix.ipojo.annotations.Bind;
 import org.apache.felix.ipojo.annotations.Invalidate;
 import org.apache.felix.ipojo.annotations.Requires;
@@ -46,6 +49,7 @@ import org.apache.felix.ipojo.annotations.Unbind;
 
 import javax.security.auth.Subject;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
@@ -166,7 +170,9 @@ public class BaseUI extends UI {
             scopesFactories.remove(extensionFactory);
             ScopeFactory scopeFactory = new ScopeFactory(roles);
             if (progressIndicator.getValue() >= 1) {
-                scopeFactory.setInstance(extensionFactory.create(new BaseUIContext(this, securityManager, uiId)));
+                if (isAllowedToShowScope(roles)) {
+                    scopeFactory.setInstance(extensionFactory.create(new BaseUIContext(this, securityManager, uiId)));
+                }
             }
             scopesFactories.put(extensionFactory, scopeFactory);
         }
@@ -319,6 +325,7 @@ public class BaseUI extends UI {
                     Label error = new Label(
                             "Wrong username or password.",
                             ContentMode.HTML);
+                    error.setId("webconsole_login_error");
                     error.addStyleName("error");
                     error.setSizeUndefined();
                     error.addStyleName("light");
@@ -447,16 +454,26 @@ public class BaseUI extends UI {
 
         };
         nav = new Navigator(this, content);
+        nav.addView("", new NavigatorView(new CssLayout()));
+        nav.addView("/", new NavigatorView(new CssLayout()));
 
         menu.removeAllComponents();
 
-        // Tell scopesFactories view factories to create views
+        //Compute nb scopes to bound
+        Map<ExtensionFactory, ScopeFactory> scopesToBound = new HashMap<>();
         for (Map.Entry<ExtensionFactory, ScopeFactory> scopeFactoryEntry : scopesFactories.entrySet()) {
+            if (isAllowedToShowScope(scopeFactoryEntry.getValue().getRoles())) {
+                scopesToBound.put(scopeFactoryEntry.getKey(), scopeFactoryEntry.getValue());
+            }
+        }
+        nbScopesToBound = scopesToBound.size();
+
+        // Tell scopesFactories view factories to create views
+        for (Map.Entry<ExtensionFactory, ScopeFactory> scopeFactoryEntry : scopesToBound.entrySet()) {
             if (isAllowedToShowScope(scopeFactoryEntry.getValue().getRoles())) {
                 ExtensionFactory extensionFactory = scopeFactoryEntry.getKey();
                 ScopeFactory scopeFactory = scopeFactoryEntry.getValue();
                 scopeFactory.setInstance(extensionFactory.create(new BaseUIContext(this, securityManager, uiId)));
-                nbScopesToBound++;
             }
         }
 
@@ -483,6 +500,7 @@ public class BaseUI extends UI {
             public void afterViewChange(ViewChangeEvent event) {
             }
         });
+        nav.navigateTo("/");
     }
 
     private void buildProgressIndicatorView() {
@@ -506,13 +524,13 @@ public class BaseUI extends UI {
         labels.addComponent(title);
         labels.setComponentAlignment(title, Alignment.MIDDLE_RIGHT);
 
-        int scopesViewsBound = scopes.size();
+        Float scopesViewsBound = (float) scopes.size();
         final Float stopValue = new Float(1.0);
 
         if (scopesFactories.isEmpty()) {
             progressIndicator.setValue(stopValue);
         } else {
-            progressIndicator.setValue(Float.valueOf(scopesViewsBound / nbScopesToBound));
+            progressIndicator.setValue(scopesViewsBound/nbScopesToBound);
         }
 
         if (stopValue.equals(progressIndicator.getValue())) {
@@ -678,7 +696,39 @@ public class BaseUI extends UI {
     }
 
     private boolean isAllowedToShowScope(String[] rolesAllowed) {
+        if (securityManager == null) return true;
         return securityManager.isUserInRoles(rolesAllowed);
+    }
+
+    @Override
+    public void access(Runnable runnable) throws UIDetachedException {
+        Map<Class<?>, CurrentInstance> old = null;
+
+        VaadinSession session = getSession();
+
+        if (session == null) {
+            throw new UIDetachedException();
+        }
+
+        // TODO hack to avoid exception when another session had lock
+        // TODO PGWK-7
+        //VaadinService.verifyNoOtherSessionLocked(session);
+
+        session.lock();
+        try {
+            if (getSession() == null) {
+                // UI was detached after fetching the session but before we
+                // acquired the lock.
+                throw new UIDetachedException();
+            }
+            old = CurrentInstance.setThreadLocals(this);
+            runnable.run();
+        } finally {
+            session.unlock();
+            if (old != null) {
+                CurrentInstance.restoreThreadLocals(old);
+            }
+        }
     }
 
     public class TimeOutThread extends Thread {
