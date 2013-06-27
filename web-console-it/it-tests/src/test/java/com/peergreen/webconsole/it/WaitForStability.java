@@ -33,6 +33,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import static org.ops4j.pax.exam.CoreOptions.junitBundles;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.options;
@@ -50,12 +53,14 @@ public class WaitForStability {
     private StabilityHelper helper;
 
     @Configuration
-    public Option[] config() {
+    public Option[] config() throws URISyntaxException {
         // Reduce log level.
         Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         root.setLevel(Level.INFO);
+        URI file = getClass().getResource("/adminConsole.xml").toURI();
 
-        return options(systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("WARN"),
+        return options(systemProperty("admin.console.test.configuration").value(file.toString()),
+                systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("WARN"),
                 mavenBundle("org.slf4j", "slf4j-api").version("1.7.2"),
                 mavenBundle("org.slf4j", "slf4j-simple").version("1.7.2").noStart(),
                 mavenBundle("org.jsoup", "jsoup").version("1.6.3"),
@@ -72,7 +77,7 @@ public class WaitForStability {
     @Before
     public void init() throws Exception {
         helper = new StabilityHelper(queueService);
-        helper.waitForIPOJOStability();
+        helper.waitForStability();
     }
 
     /**

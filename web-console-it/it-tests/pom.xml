@@ -17,33 +17,40 @@
   </properties>
 
   <dependencies>
-    <!-- Web Console  -->
+    <!-- Web BaseConsole  -->
     <dependency>
       <groupId>com.peergreen.webconsole</groupId>
       <artifactId>web-console-api</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>com.peergreen.webconsole</groupId>
       <artifactId>web-console-core</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>com.peergreen.webconsole</groupId>
       <artifactId>vaadin-all</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>${project.version}</version>
       <scope>provided</scope>
+    </dependency>
+
+    <!-- htmlunit dependencies  -->
+    <dependency>
+      <groupId>com.peergreen.webconsole</groupId>
+      <artifactId>htmlunit-all</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <!-- Deployment api -->
     <dependency>
       <groupId>com.peergreen.deployment</groupId>
       <artifactId>deployment-api</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.2-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
 
@@ -117,13 +124,6 @@
       <artifactId>org.apache.felix.ipojo</artifactId>
       <version>1.10.1</version>
       <scope>test</scope>
-    </dependency>
-
-    <!-- htmlunit dependencies  -->
-    <dependency>
-      <groupId>com.peergreen.webconsole</groupId>
-      <artifactId>htmlunit-all</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
     </dependency>
 
   </dependencies>

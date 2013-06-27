@@ -58,11 +58,21 @@ public class UIProviderBase extends UIProvider {
 
     /**
      * Set console
-     * @param console
+     * @param consoleName
      */
-    public void setConsole(IConsole console) {
-        this.console = console;
+    public void setConsoleName(String consoleName) {
+        this.consoleName = consoleName;
     }
+
+    public void setConsoleAlias(String consoleAlias) {
+        this.consoleAlias = consoleAlias.substring(1);
+    }
+
+    public void setEnableSecurity(Boolean enableSecurity) {
+        this.enableSecurity = enableSecurity;
+    }
+
+
 
     /** {@inheritDoc}
      */

@@ -212,7 +212,7 @@ public class BaseUI extends UI {
     @Override
     protected void init(VaadinRequest request) {
         setLocale(Locale.US);
-        getPage().setTitle(consoleName);
+        getPage().setTitle("Welcome to " + consoleName);
         setContent(root);
         root.addStyleName("root");
         root.setSizeFull();
@@ -244,6 +244,7 @@ public class BaseUI extends UI {
         addStyleName("login");
 
         loginLayout = new VerticalLayout();
+        loginLayout.setId("webconsole_loginlayout_id");
         loginLayout.setSizeFull();
         loginLayout.addStyleName("login-layout");
         root.addComponent(loginLayout);
@@ -275,12 +276,15 @@ public class BaseUI extends UI {
 
         final TextField username = new TextField("Username");
         username.focus();
+        username.setId("webconsole_login_username");
         fields.addComponent(username);
 
         final PasswordField password = new PasswordField("Password");
+        password.setId("webconsole_login_password");
         fields.addComponent(password);
 
         final Button signin = new Button("Sign In");
+        signin.setId("webconsole_login_signin");
         signin.addStyleName("default");
         fields.addComponent(signin);
         fields.setComponentAlignment(signin, Alignment.BOTTOM_LEFT);
@@ -335,7 +339,9 @@ public class BaseUI extends UI {
      * Build main view
      */
     private void buildMainView() {
+        getPage().setTitle(consoleName);
         menu = new CssLayout();
+        menu.setId("webconsole_mainlayout_id");
         content = new CssLayout();
         //buildRoutes();
 

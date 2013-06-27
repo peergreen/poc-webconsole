@@ -16,7 +16,6 @@
   <modules>
     <module>web-console-core</module>
     <module>web-console-modules</module>
-    <module>web-console-pgadmin</module>
     <module>web-console-api</module>
     <module>vaadin-all</module>
     <module>web-console-it</module>

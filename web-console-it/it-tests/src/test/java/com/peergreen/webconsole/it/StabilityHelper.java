@@ -1,9 +1,8 @@
 package com.peergreen.webconsole.it;
 
-import com.gargoylesoftware.htmlunit.WebClient;
-import org.apache.felix.ipojo.extender.queue.QueueService;
-
 import static java.lang.String.format;
+
+import org.apache.felix.ipojo.extender.queue.QueueService;
 
 /**
  * User: guillaume
@@ -21,12 +20,8 @@ public class StabilityHelper {
         this.queueService = queueService;
     }
 
-    public void waitForIPOJOStability() throws Exception {
-        waitForStability(DEFAULT_TIMEOUT, null);
-    }
-
-    public void waitForWebConsoleStability(String url) throws Exception {
-        waitForStability(DEFAULT_TIMEOUT, url);
+    public void waitForStability() throws Exception {
+        waitForStability(DEFAULT_TIMEOUT);
     }
 
     /**
@@ -34,13 +29,13 @@ public class StabilityHelper {
      * @param timeout milliseconds
      * @throws Exception
      */
-    public void waitForStability(long timeout, String url) throws Exception {
+    public void waitForStability(long timeout) throws Exception {
 
         long sleepTime = 0;
         long startupTime = System.currentTimeMillis();
         do {
             long elapsedTime = System.currentTimeMillis() - startupTime;
-            if (isStable(url)) {
+            if (isStable()) {
                 //System.out.printf("Stability reached after %d ms%n", elapsedTime);
                 return;
             }
@@ -64,27 +59,8 @@ public class StabilityHelper {
 
     }
 
-    private boolean isStable(String url) {
-        if (url == null) {
-            return queueService.getWaiters() == 0 && queueService.getFinished() > 0;
-        } else {
-            try {
-                getNewWebClient().getPage(url);
-                Thread.sleep(3000);
-                return true;
-            } catch (Exception e) {
-                return false;
-            }
-        }
-    }
-
-    private WebClient getNewWebClient() {
-        WebClient webClient = new WebClient();
-        webClient.getOptions().setThrowExceptionOnScriptError(false);
-        webClient.getOptions().setCssEnabled(true);
-        webClient.getOptions().setJavaScriptEnabled(true);
-
-        return webClient;
+    private boolean isStable() {
+        return queueService.getWaiters() == 0 && queueService.getFinished() > 0;
     }
 
 }
