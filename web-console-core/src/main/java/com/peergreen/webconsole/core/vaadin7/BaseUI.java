@@ -637,7 +637,7 @@ public class BaseUI extends UI {
                 }
             });
 
-            notifierService.addScopeButton(scopeView, b, notify);
+            notifierService.addScopeButton(scopeView, b, this, notify);
 
             scopes.get(scopeName).setScopeMenuButton(b);
 

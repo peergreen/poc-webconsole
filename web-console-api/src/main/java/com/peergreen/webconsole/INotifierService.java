@@ -2,6 +2,7 @@ package com.peergreen.webconsole;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.UI;
 
 /**
  * Notifier service
@@ -24,7 +25,7 @@ public interface INotifierService {
      * @param button
      * @param notify
      */
-    void addScopeButton(Component scope, Button button, boolean notify);
+    void addScopeButton(Component scope, Button button, UI ui, boolean notify);
 
     /**
      * Remove scope button reference

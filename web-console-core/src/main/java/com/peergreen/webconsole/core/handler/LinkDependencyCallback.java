@@ -1,11 +1,16 @@
 package com.peergreen.webconsole.core.handler;
 
+import com.peergreen.webconsole.INotifierService;
+import com.peergreen.webconsole.Link;
+import com.peergreen.webconsole.Unlink;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.UI;
 import org.apache.felix.ipojo.InstanceManager;
 import org.apache.felix.ipojo.handlers.dependency.Dependency;
 import org.apache.felix.ipojo.handlers.dependency.DependencyCallback;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  * @author Mohammed Boukada
@@ -13,6 +18,7 @@ import java.lang.reflect.InvocationTargetException;
 public class LinkDependencyCallback extends DependencyCallback {
 
     private UI ui;
+    private INotifierService notifierService;
     private InstanceManager manager;
 
     /**
@@ -23,9 +29,10 @@ public class LinkDependencyCallback extends DependencyCallback {
      * @param methodType : is the method to call a bind method or an unbind
      *                   method
      */
-    public LinkDependencyCallback(Dependency dep, String method, int methodType, UI ui) {
+    public LinkDependencyCallback(Dependency dep, String method, int methodType, UI ui, INotifierService notifierService) {
         super(dep, method, methodType);
         this.ui = ui;
+        this.notifierService = notifierService;
         this.manager = dep.getHandler().getInstanceManager();
     }
 
@@ -44,6 +51,7 @@ public class LinkDependencyCallback extends DependencyCallback {
                 public void run() {
                     try {
                         newObject[0] =  m_methodObj.invoke(manager.getPojoObject(), arg);
+                        updateNotifier();
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
                     } catch (InvocationTargetException e) {
@@ -59,6 +67,7 @@ public class LinkDependencyCallback extends DependencyCallback {
                     public void run() {
                         try {
                             newObject[0] = m_methodObj.invoke(manager.getPojoObjects()[finalI], arg);
+                            updateNotifier();
                         } catch (IllegalAccessException e) {
                             e.printStackTrace();
                         } catch (InvocationTargetException e) {
@@ -82,6 +91,7 @@ public class LinkDependencyCallback extends DependencyCallback {
             public void run() {
                 try {
                     newObject[0] = m_methodObj.invoke(instance, arg);
+                    updateNotifier();
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 } catch (InvocationTargetException e) {
@@ -90,5 +100,19 @@ public class LinkDependencyCallback extends DependencyCallback {
             }
         });
         return newObject[0];
+    }
+
+    public void setNotifierService(INotifierService notifierService) {
+        this.notifierService = notifierService;
+    }
+
+    private void updateNotifier() {
+        if (notifierService != null) {
+            if (m_methodObj.isAnnotationPresent(Link.class)) {
+                notifierService.incrementBadge((Component) manager.getPojoObject());
+            } else if (m_methodObj.isAnnotationPresent(Unlink.class)) {
+                notifierService.decrementBadge((Component) manager.getPojoObject());
+            }
+        }
     }
 }

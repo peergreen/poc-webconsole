@@ -2,6 +2,7 @@ package com.peergreen.webconsole.core.handler;
 
 import com.peergreen.webconsole.Constants;
 import com.peergreen.webconsole.ExtensionFactory;
+import com.peergreen.webconsole.INotifierService;
 import com.peergreen.webconsole.ISecurityManager;
 import com.peergreen.webconsole.Inject;
 import com.peergreen.webconsole.InstanceHandler;
@@ -16,6 +17,7 @@ import org.apache.felix.ipojo.InstanceStateListener;
 import org.apache.felix.ipojo.Pojo;
 import org.apache.felix.ipojo.annotations.Bind;
 import org.apache.felix.ipojo.annotations.Handler;
+import org.apache.felix.ipojo.annotations.Requires;
 import org.apache.felix.ipojo.annotations.Unbind;
 import org.apache.felix.ipojo.architecture.ComponentTypeDescription;
 import org.apache.felix.ipojo.architecture.HandlerDescription;
@@ -51,8 +53,10 @@ public class ExtensionHandler extends DependencyHandler {
     private Map<String, ExtensionPoint> bindings;
     private List<Field> fieldsToBind;
     private Map<ExtensionFactory, InstanceHandler> instances = new HashMap<>();
+    private List<LinkDependencyCallback> dependencyCallbacks = new ArrayList<>();
     private UIContext uiContext;
     private InstanceManager ownInstanceManager = new OwnInstanceManager();
+    private INotifierService notifierService;
 
     public void setOwnInstanceManager(InstanceManager instanceManager) {
         this.ownInstanceManager = instanceManager;
@@ -346,7 +350,25 @@ public class ExtensionHandler extends DependencyHandler {
 
     @Override
     protected DependencyCallback createDependencyHandler(Dependency dep, String method, int type) {
-        return new LinkDependencyCallback(dep, method, type, uiContext.getUI());
+        LinkDependencyCallback linkDependencyCallback = new LinkDependencyCallback(dep, method, type, uiContext.getUI(), notifierService);
+        dependencyCallbacks.add(linkDependencyCallback);
+        return linkDependencyCallback;
+    }
+
+    @Bind(optional = true)
+    public void bindNotifierService(INotifierService notifierService) {
+        this.notifierService = notifierService;
+        for (LinkDependencyCallback dependencyCallback : dependencyCallbacks) {
+            dependencyCallback.setNotifierService(notifierService);
+        }
+    }
+
+    @Unbind
+    public void unbindNotifierService(INotifierService notifierService) {
+        this.notifierService = null;
+        for (LinkDependencyCallback dependencyCallback : dependencyCallbacks) {
+            dependencyCallback.setNotifierService(null);
+        }
     }
 
     public static interface InstanceManager {

@@ -16,6 +16,7 @@ import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.UI;
 import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Instantiate;
 import org.apache.felix.ipojo.annotations.Provides;
@@ -39,15 +40,9 @@ public class NotifierService implements INotifierService {
     private List<NotificationOverlay> overlays = new ArrayList<>();
 
     /**
-     * Badges for each scope button
-     */
-    private ConcurrentHashMap<com.vaadin.ui.Component, Integer> badges = new ConcurrentHashMap<>();
-
-    /**
      * Scope buttons in each view
      */
-    private ConcurrentHashMap<com.vaadin.ui.Component, Button> scopesButtons = new ConcurrentHashMap<>();
-
+    private ConcurrentHashMap<com.vaadin.ui.Component, ScopeButton> scopesButtons = new ConcurrentHashMap<>();
     /**
      * Close all overlays
      */
@@ -78,11 +73,10 @@ public class NotifierService implements INotifierService {
 
     /** {@inheritDoc}
      */
-    public void addScopeButton(com.vaadin.ui.Component scope, Button button, boolean notify) {
-        scopesButtons.put(scope, button);
-        badges.put(scope, 0);
+    public void addScopeButton(com.vaadin.ui.Component scope, Button button, UI ui, boolean notify) {
+        scopesButtons.put(scope, new ScopeButton(button, ui, 0));
         if (notify) {
-            setBadgeAsNew(button);
+            setBadgeAsNew(button, ui);
         }
     }
 
@@ -91,7 +85,6 @@ public class NotifierService implements INotifierService {
     public void removeScopeButton(com.vaadin.ui.Component scope) {
         if (scopesButtons.containsKey(scope)) {
             scopesButtons.remove(scope);
-            badges.remove(scope);
         }
     }
 
@@ -99,7 +92,7 @@ public class NotifierService implements INotifierService {
      */
     public void hideScopeButton(com.vaadin.ui.Component scope) {
         if (scopesButtons.containsKey(scope)) {
-            scopesButtons.get(scope).setVisible(false);
+            scopesButtons.get(scope).getScopeButton().setVisible(false);
         }
     }
 
@@ -108,8 +101,10 @@ public class NotifierService implements INotifierService {
      */
     public void removeBadge(com.vaadin.ui.Component scope) {
         updateBadge(scope, 0);
-        scopesButtons.get(scope).setHtmlContentAllowed(true);
-        setCaption(scopesButtons.get(scope), getInitialCaption(scopesButtons.get(scope)));
+        scopesButtons.get(scope).getScopeButton().setHtmlContentAllowed(true);
+        setCaption(scopesButtons.get(scope).getScopeButton(),
+                   scopesButtons.get(scope).getButtonUi(),
+                   getInitialCaption(scopesButtons.get(scope).getScopeButton()));
     }
 
     /** {@inheritDoc}
@@ -117,11 +112,13 @@ public class NotifierService implements INotifierService {
     public void incrementBadge(com.vaadin.ui.Component scope) {
         if (scopesButtons.containsKey(scope)) {
             updateBadge(scope, +1);
-            scopesButtons.get(scope).setVisible(true);
-            scopesButtons.get(scope).setHtmlContentAllowed(true);
-            String newCaption = getInitialCaption(scopesButtons.get(scope)) +
-                    "<span class=\"badge\">" + badges.get(scope) +"</span>";
-            setCaption(scopesButtons.get(scope), newCaption);
+            scopesButtons.get(scope).getScopeButton().setVisible(true);
+            scopesButtons.get(scope).getScopeButton().setHtmlContentAllowed(true);
+            String newCaption = getInitialCaption(scopesButtons.get(scope).getScopeButton()) +
+                    "<span class=\"badge\">" + scopesButtons.get(scope).getBadge() +"</span>";
+            setCaption(scopesButtons.get(scope).getScopeButton(),
+                       scopesButtons.get(scope).getButtonUi(),
+                       newCaption);
         }
     }
 
@@ -130,10 +127,13 @@ public class NotifierService implements INotifierService {
     public void decrementBadge(com.vaadin.ui.Component scope) {
         if (scopesButtons.containsKey(scope)) {
             updateBadge(scope, -1);
-            scopesButtons.get(scope).setHtmlContentAllowed(true);
-            String newCaption = getInitialCaption(scopesButtons.get(scope)) +
-                    ((badges.get(scope) == 0) ? "" : "<span class=\"badge\">" + badges.get(scope) +"</span>");
-            setCaption(scopesButtons.get(scope), newCaption);
+            scopesButtons.get(scope).getScopeButton().setHtmlContentAllowed(true);
+            String newCaption = getInitialCaption(scopesButtons.get(scope).getScopeButton()) +
+                    ((scopesButtons.get(scope).getBadge() == 0) ? "" : "<span class=\"badge\">" +
+                            scopesButtons.get(scope).getBadge() +"</span>");
+            setCaption(scopesButtons.get(scope).getScopeButton(),
+                       scopesButtons.get(scope).getButtonUi(),
+                       newCaption);
         }
     }
 
@@ -141,16 +141,16 @@ public class NotifierService implements INotifierService {
      * Set badge as new
      * @param button
      */
-    private void setBadgeAsNew(final Button button) {
+    private void setBadgeAsNew(final Button button, UI ui) {
         button.setHtmlContentAllowed(true);
         final String newCaption = getInitialCaption(button) +
                 "<span class=\"badge\">new</span>";
-        setCaption(button, newCaption);
+        setCaption(button, ui, newCaption);
 
     }
 
-    private void setCaption(final Button button, final String caption) {
-        button.getUI().access(new Runnable() {
+    private void setCaption(final Button button, UI ui, final String caption) {
+        ui.access(new Runnable() {
             @Override
             public void run() {
                 button.setCaption(caption);
@@ -164,8 +164,8 @@ public class NotifierService implements INotifierService {
      * @param op
      */
     private void updateBadge(com.vaadin.ui.Component scope, int op) {
-        if (badges.containsKey(scope)) {
-            Integer badge = badges.get(scope);
+        if (scopesButtons.containsKey(scope)) {
+            Integer badge = scopesButtons.get(scope).getBadge();
             if (op == 0) {
                 badge = 0;
             } else if (op == +1) {
@@ -173,7 +173,7 @@ public class NotifierService implements INotifierService {
             } else if (op == -1 && badge > 0) {
                 badge--;
             }
-            badges.put(scope, badge);
+            scopesButtons.get(scope).setBadge(badge);
         }
     }
 
@@ -183,7 +183,7 @@ public class NotifierService implements INotifierService {
      * @return
      */
     private String getInitialCaption(Button button) {
-        if (button.getCaption().indexOf("<span") != -1) {
+        if (button.getCaption().contains("<span")) {
             return button.getCaption().substring(0, button.getCaption().indexOf("<span"));
         }
         return button.getCaption();
