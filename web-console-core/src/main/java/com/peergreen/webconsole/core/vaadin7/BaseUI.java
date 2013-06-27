@@ -110,9 +110,10 @@ public class BaseUI extends UI {
     private Map<String, Scope> scopes = new ConcurrentHashMap<>();
 
     /**
-     * Console name
+     * BaseConsole name
       */
     private String consoleName;
+    private Boolean enableSecurity;
 
     private String scopeExtensionPoint;
 
@@ -141,15 +142,17 @@ public class BaseUI extends UI {
     /**
      * Base console UI constructor
      */
-    public BaseUI(String consoleName, String extensionPoint, int uiId) {
+    public BaseUI(String consoleName, String extensionPoint, String uiId, Boolean enableSecurity) {
         this.consoleName = consoleName;
         this.scopeExtensionPoint = extensionPoint;
         this.uiId = uiId;
+        this.enableSecurity = enableSecurity;
     }
 
     @Invalidate
     public void stop() {
-        System.out.print("");
+        // Unregister Vaadin connector
+        getConnectorTracker().unregisterConnector(getConnectorTracker().getConnector(getConnectorId()));
     }
 
     /**
@@ -223,7 +226,7 @@ public class BaseUI extends UI {
         root.addComponent(bg);
 
         Boolean isLogged = (Boolean) getSession().getAttribute("is.logged");
-        if(isLogged != null && isLogged) {
+        if(!enableSecurity || (isLogged != null && isLogged)) {
             securityManager = (ISecurityManager) getSession().getAttribute("security.manager");
             buildMainView();
         } else {
@@ -375,61 +378,63 @@ public class BaseUI extends UI {
                         addComponent(menu);
                         setExpandRatio(menu, 1);
 
-                        // User menu
-                        addComponent(new VerticalLayout() {
-                            {
-                                setSizeUndefined();
-                                addStyleName("user");
-                                Image profilePic = new Image(
-                                        null,
-                                        new ThemeResource("img/profile-pic.png"));
-                                profilePic.setWidth("34px");
-                                addComponent(profilePic);
-                                Label userName = new Label(securityManager.getUserName());
-                                userName.setSizeUndefined();
-                                addComponent(userName);
+                        if (securityManager != null) {
+                            // User menu
+                            addComponent(new VerticalLayout() {
+                                {
+                                    setSizeUndefined();
+                                    addStyleName("user");
+                                    Image profilePic = new Image(
+                                            null,
+                                            new ThemeResource("img/profile-pic.png"));
+                                    profilePic.setWidth("34px");
+                                    addComponent(profilePic);
+                                    Label userName = new Label(securityManager.getUserName());
+                                    userName.setSizeUndefined();
+                                    addComponent(userName);
 
-                                MenuBar.Command cmd = new MenuBar.Command() {
-                                    @Override
-                                    public void menuSelected(
-                                            MenuBar.MenuItem selectedItem) {
-                                        Notification
-                                                .show("Not implemented yet");
-                                    }
-                                };
-                                MenuBar settings = new MenuBar();
-                                MenuBar.MenuItem settingsMenu = settings.addItem("",
-                                        null);
-                                settingsMenu.setStyleName("icon-cog");
-                                settingsMenu.addItem("Settings", cmd);
-                                settingsMenu.addItem("Preferences", cmd);
-                                settingsMenu.addSeparator();
-                                settingsMenu.addItem("My Account", cmd);
-                                addComponent(settings);
-
-                                Button exit = new NativeButton("Exit");
-                                exit.addStyleName("icon-cancel");
-                                exit.setDescription("Sign Out");
-                                addComponent(exit);
-                                exit.addClickListener(new Button.ClickListener() {
-                                    @Override
-                                    public void buttonClick(Button.ClickEvent event) {
-                                        ((SecurityManager) securityManager).setUserLogged(false);
-                                        for (Map.Entry<ExtensionFactory, ScopeFactory> scopeFactoryEntry : scopesFactories.entrySet()) {
-                                            ScopeFactory scopeFactory = scopeFactoryEntry.getValue();
-                                            if (scopeFactory.getInstance() != null) {
-                                                scopeFactory.getInstance().stop();
-                                                scopeFactory.setInstance(null);
-                                            }
+                                    MenuBar.Command cmd = new MenuBar.Command() {
+                                        @Override
+                                        public void menuSelected(
+                                                MenuBar.MenuItem selectedItem) {
+                                            Notification
+                                                    .show("Not implemented yet");
                                         }
-                                        nbScopesToBound = 0;
-                                        progressIndicator.setValue(Float.valueOf(0));
-                                        getSession().setAttribute("is.logged", false);
-                                        buildLoginView(true);
-                                    }
-                                });
-                            }
-                        });
+                                    };
+                                    MenuBar settings = new MenuBar();
+                                    MenuBar.MenuItem settingsMenu = settings.addItem("",
+                                            null);
+                                    settingsMenu.setStyleName("icon-cog");
+                                    settingsMenu.addItem("Settings", cmd);
+                                    settingsMenu.addItem("Preferences", cmd);
+                                    settingsMenu.addSeparator();
+                                    settingsMenu.addItem("My Account", cmd);
+                                    addComponent(settings);
+
+                                    Button exit = new NativeButton("Exit");
+                                    exit.addStyleName("icon-cancel");
+                                    exit.setDescription("Sign Out");
+                                    addComponent(exit);
+                                    exit.addClickListener(new Button.ClickListener() {
+                                        @Override
+                                        public void buttonClick(Button.ClickEvent event) {
+                                            ((SecurityManager) securityManager).setUserLogged(false);
+                                            for (Map.Entry<ExtensionFactory, ScopeFactory> scopeFactoryEntry : scopesFactories.entrySet()) {
+                                                ScopeFactory scopeFactory = scopeFactoryEntry.getValue();
+                                                if (scopeFactory.getInstance() != null) {
+                                                    scopeFactory.getInstance().stop();
+                                                    scopeFactory.setInstance(null);
+                                                }
+                                            }
+                                            nbScopesToBound = 0;
+                                            progressIndicator.setValue(Float.valueOf(0));
+                                            getSession().setAttribute("is.logged", false);
+                                            buildLoginView(true);
+                                        }
+                                    });
+                                }
+                            });
+                        }
                     }
                 });
 
@@ -490,7 +495,7 @@ public class BaseUI extends UI {
         labels.setMargin(true);
         progressPanel.addComponent(labels);
 
-        Label welcome = new Label("Welcome " + securityManager.getUserName());
+        Label welcome = new Label("Welcome " + ((securityManager == null)? "":securityManager.getUserName()));
         welcome.addStyleName("h4");
         labels.addComponent(welcome);
         labels.setComponentAlignment(welcome, Alignment.MIDDLE_LEFT);

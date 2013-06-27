@@ -198,6 +198,7 @@ public class ExtensionHandler extends DependencyHandler {
     }
 
     private boolean isInRoles(Dictionary properties) {
+        if (uiContext.getSecurityManager() == null) return true;
         String[] extensionRoles = (String[]) properties.get(Constants.EXTENSION_ROLES);
         return uiContext.getSecurityManager().isUserInRoles(extensionRoles);
     }
