@@ -124,7 +124,7 @@ public class BaseUI extends UI {
     /**
      * UI id
      */
-    private Integer uiId;
+    private String uiId;
 
     /**
      * Notifier service

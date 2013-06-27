@@ -1,7 +1,6 @@
 package com.peergreen.webconsole.core.vaadin7;
 
 import com.peergreen.webconsole.Constants;
-import com.peergreen.webconsole.IConsole;
 import com.vaadin.server.UIClassSelectionEvent;
 import com.vaadin.server.UICreateEvent;
 import com.vaadin.server.UIProvider;
@@ -12,12 +11,15 @@ import org.apache.felix.ipojo.Factory;
 import org.apache.felix.ipojo.MissingHandlerException;
 import org.apache.felix.ipojo.UnacceptableConfiguration;
 import org.apache.felix.ipojo.annotations.Component;
+import org.apache.felix.ipojo.annotations.Invalidate;
 import org.apache.felix.ipojo.annotations.Provides;
 import org.apache.felix.ipojo.annotations.Requires;
 import org.osgi.framework.BundleContext;
 
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.List;
 
 /**
  * Vaadin Base console UI provider
@@ -27,10 +29,11 @@ import java.util.Hashtable;
 @Provides(specifications = UIProvider.class)
 public class UIProviderBase extends UIProvider {
 
-    /**
-     * Console
-     */
-    private IConsole console;
+    private String consoleName;
+    private String consoleAlias;
+    private Boolean enableSecurity;
+
+    List<ComponentInstance> uis = new ArrayList<>();
 
     /**
      * Base console UI ipojo component factory
@@ -43,7 +46,7 @@ public class UIProviderBase extends UIProvider {
      */
     private BundleContext bundleContext;
 
-    private int uiId = 0;
+    private int i = 0;
 
     /**
      * Vaadin base UI provider constructor
@@ -72,12 +75,12 @@ public class UIProviderBase extends UIProvider {
      */
     @Override
     public UI createInstance(final UICreateEvent e) {
-
         BaseUI ui = null;
         try {
             // Create an instance of baseUI
-            String scopeExtensionPoint = "com.peergreen.webconsole." + console.getConsoleAlias().substring(1) + ".scope";
-            ui = new BaseUI(console.getConsoleName(), scopeExtensionPoint, uiId);
+            String scopeExtensionPoint = "com.peergreen.webconsole.scope";
+            String uiId = consoleAlias + "-" + i;
+            ui = new BaseUI(consoleName, scopeExtensionPoint, uiId, enableSecurity);
 
             // Configuration properties for ipojo component
             Dictionary<String, Object> props = new Hashtable<>();

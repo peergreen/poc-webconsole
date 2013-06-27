@@ -82,7 +82,7 @@ public class ExtensionHandlerTestCase {
     @Test
     public void testCreateBindings() {
         ExtensionPointProvider extensionPointProvider = new ExtensionPointProvider();
-        int uiId = 1;
+        String uiId = "id-1";
 
         when(uiContext.getSecurityManager()).thenReturn(securityManager);
         when(instanceManager.getPojoObject()).thenReturn(extensionPointProvider);

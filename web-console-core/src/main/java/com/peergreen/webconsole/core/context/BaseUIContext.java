@@ -11,9 +11,9 @@ public class BaseUIContext implements UIContext {
 
     private UI ui;
     private ISecurityManager securityManager;
-    private int uiId;
+    private String uiId;
 
-    public BaseUIContext(UI ui, ISecurityManager securityManager, int uiId) {
+    public BaseUIContext(UI ui, ISecurityManager securityManager, String uiId) {
         this.ui = ui;
         this.securityManager = securityManager;
         this.uiId = uiId;
@@ -30,7 +30,7 @@ public class BaseUIContext implements UIContext {
     }
 
     @Override
-    public int getUIId() {
+    public String getUIId() {
         return uiId;
     }
 }

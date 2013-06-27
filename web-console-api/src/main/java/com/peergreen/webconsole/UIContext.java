@@ -15,5 +15,5 @@ public interface UIContext {
 
     UI getUI();
 
-    int getUIId();
+    String getUIId();
 }
