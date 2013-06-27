@@ -19,7 +19,7 @@ import java.util.Dictionary;
  * @author Mohammed Boukada
  */
 @Extension
-@ExtensionPoint("com.peergreen.webconsole.pgadmin.scope")
+@ExtensionPoint("com.peergreen.webconsole.scope")
 @Scope("test")
 public class TestScope extends TabSheet {
 

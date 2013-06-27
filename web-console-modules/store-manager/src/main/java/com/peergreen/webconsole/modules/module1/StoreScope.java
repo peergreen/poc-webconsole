@@ -18,17 +18,13 @@ import java.util.Dictionary;
  * @author Mohammed Boukada
  */
 @Extension
-@ExtensionPoint("com.peergreen.webconsole.pgadmin.scope")
+@ExtensionPoint("com.peergreen.webconsole.scope")
 @Scope("Store")
 public class StoreScope extends TabSheet {
-
-    @Inject
-    ISecurityManager securityManager;
 
     @Ready
     public void createView() {
         setSizeFull();
-        securityManager.getUserName();
     }
 
     @Link("tab")
